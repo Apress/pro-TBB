@@ -1,0 +1,63 @@
+# Copyright (C) 2019 Intel Corporation
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /EHsc
+LIBS = tbb.lib
+
+all : fig_12_01 fig_12_03 fig_12_04 fig_12_05 fig_12_06 fig_12_07 fig_12_09 fig_12_10 fig_12_11 fig_12_12
+
+fig_12_01 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_01.exe fig_12_01.cpp $(LIBS)
+
+fig_12_03 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_03.exe fig_12_03.cpp $(LIBS)
+
+fig_12_04 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_04.exe fig_12_04.cpp $(LIBS)
+
+fig_12_05 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_05.exe fig_12_05.cpp $(LIBS)
+
+fig_12_06 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_06.exe fig_12_06.cpp $(LIBS)
+
+fig_12_07 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_07.exe fig_12_07.cpp $(LIBS)
+
+fig_12_09 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_09.exe fig_12_09.cpp $(LIBS)
+
+fig_12_10 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_10.exe fig_12_10.cpp $(LIBS)
+
+fig_12_11 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_11.exe fig_12_11.cpp $(LIBS)
+
+fig_12_12 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_12_12.exe fig_12_12.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_12_01.exe fig_12_03.exe fig_12_04.exe fig_12_05.exe fig_12_06.exe fig_12_07.exe fig_12_09.exe fig_12_10.exe fig_12_11.exe fig_12_12.exe fig_12_01.obj fig_12_03.obj fig_12_04.obj fig_12_05.obj fig_12_06.obj fig_12_07.obj fig_12_09.obj fig_12_10.obj fig_12_11.obj fig_12_12.obj *.bmp *.txt out*.png
+
+.phony : 
+

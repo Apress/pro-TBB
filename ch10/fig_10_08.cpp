@@ -1,0 +1,103 @@
+/*
+Copyright (C) 2019 Intel Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom
+the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
+
+SPDX-License-Identifier: MIT
+*/
+
+#include <iostream>
+#include <tbb/task.h>
+#include <tbb/tick_count.h>
+#include <tbb/task_scheduler_init.h>
+
+int cutoff = 30;
+
+long fib(long n) {
+  if(n<2)
+    return n;
+  else
+    return fib(n-1)+fib(n-2);
+}
+
+class FibTask: public tbb::task {
+public:
+  long const n;
+  long* const sum;
+  FibTask(long n_, long* sum_) : n{n_}, sum{sum_} {}
+  tbb::task* execute() { // Overrides virtual function task::execute
+    if(n<cutoff) {
+      *sum = fib(n);
+    }
+    else {
+      long x = 0, y = 0;
+//Define SHOWPOINTERS if you want to analyze the stack
+#ifdef SHOWPOINTERS
+      std::cout << "n: "<<n;
+      std::cout << " dir x: " << &x;
+      std::cout << " dir y: " << &y;
+      std::cout << " dir sum: " << sum <<std::endl;
+#endif
+      FibTask& a = *new(tbb::task::allocate_child()) FibTask{n-1, &x};
+      FibTask& b = *new(tbb::task::allocate_child()) FibTask{n-2, &y};
+      // Set ref_count to "two children plus one for the wait".
+      tbb::task::set_ref_count(3);
+      // Start b running.
+      tbb::task::spawn(b);
+      // Start a running and wait for all children (a and b).
+      tbb::task::spawn_and_wait_for_all(a);
+      // Do the sum
+      *sum = x+y;
+    }
+    return nullptr;
+  }
+};
+
+long parallel_fib(long n) {
+  long sum = 0;
+  FibTask& a = *new(tbb::task::allocate_root()) FibTask{n,&sum};
+  tbb::task::spawn_root_and_wait(a);
+  return sum;
+}
+
+int main(int argc, char** argv)
+{
+int n = 30;
+int nth = 4;
+#ifdef SHOWPOINTERS
+  nth=1;
+#endif
+
+tbb::task_scheduler_init init{nth};
+
+auto t0 = tbb::tick_count::now();
+long fib_s = fib(n);
+auto t1 = tbb::tick_count::now();
+long fib_p = parallel_fib(n);
+auto t2 = tbb::tick_count::now();
+double t_s = (t1 - t0).seconds();
+double t_p = (t2 - t1).seconds();
+
+std::cout << "SerialFib:   " << fib_s << " Time: " << t_s << "\n";
+std::cout << "ParallelFib: " << fib_p << " Time: " << t_p << " Speedup: " << t_s/t_p << "\n";
+return 0;
+}
+//g++ -o f fig_10_08.cpp -std=c++11 -O3 -ltbb -Wall -pedantic -ltbbmalloc_proxy
+// SerialFib:   102334155 Time: 0.535139
+// ParallelFib: 102334155 Time: 0.138401 Speedup: 3.86658

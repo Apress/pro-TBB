@@ -1,0 +1,57 @@
+# Copyright (C) 2019 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /I..\common /EHsc
+LIBS = tbb.lib
+
+all : fig_1_04 fig_1_05 fig_1_07 fig_1_10 fig_1_11 fig_1_12 sidebar_functor sidebar_lambda
+
+fig_1_04 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_1_04.exe fig_1_04.cpp $(LIBS)
+
+fig_1_05 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_1_05.exe fig_1_05.cpp $(LIBS)
+
+fig_1_07 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_1_07.exe fig_1_07.cpp $(LIBS)
+
+fig_1_10 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_1_10.exe fig_1_10.cpp $(LIBS)
+
+fig_1_11 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_1_11.exe fig_1_11.cpp $(LIBS)
+
+fig_1_12 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_1_12.exe fig_1_12.cpp $(LIBS)
+
+sidebar_functor : .phony
+	$(CXX) $(CXXFLAGS) /Fesidebar_functor.exe sidebar_functor.cpp $(LIBS)
+
+sidebar_lambda : .phony
+	$(CXX) $(CXXFLAGS) /Fesidebar_lambda.exe sidebar_lambda.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_1_04.exe fig_1_05.exe fig_1_07.exe fig_1_10.exe fig_1_11.exe fig_1_12.exe sidebar_functor.exe sidebar_lambda.exe fig_1_04.obj fig_1_05.obj fig_1_07.obj fig_1_10.obj fig_1_11.obj fig_1_12.obj sidebar_functor.obj sidebar_lambda.obj *.bmp *.txt out*.png
+
+.phony : 
+

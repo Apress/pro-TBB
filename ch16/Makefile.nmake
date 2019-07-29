@@ -1,0 +1,78 @@
+# Copyright (C) 2019 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /EHsc
+LIBS = tbb.lib
+
+all : fig_16_04 fig_16_06 fig_16_09 fig_16_11 fig_16_14 fig_16_16 fig_16_17 fig_16_19 fig_16_20 fig_16_21 fig_16_22 fig_16_23 fig_16_24 fig_16_25 fig_16_26
+
+fig_16_04 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_04.exe fig_16_04.cpp $(LIBS)
+
+fig_16_06 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_06.exe fig_16_06.cpp $(LIBS)
+
+fig_16_09 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_09.exe fig_16_09.cpp $(LIBS)
+
+fig_16_11 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_11.exe fig_16_11.cpp $(LIBS)
+
+fig_16_14 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_14.exe fig_16_14.cpp $(LIBS)
+
+fig_16_16 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_16.exe fig_16_16.cpp $(LIBS)
+
+fig_16_17 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_17.exe fig_16_17.cpp $(LIBS)
+
+fig_16_19 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_19.exe fig_16_19.cpp $(LIBS)
+
+fig_16_20 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_20.exe fig_16_20.cpp $(LIBS)
+
+fig_16_21 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_21.exe fig_16_21.cpp $(LIBS)
+
+fig_16_22 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_22.exe fig_16_22.cpp $(LIBS)
+
+fig_16_23 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_23.exe fig_16_23.cpp $(LIBS)
+
+fig_16_24 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_24.exe fig_16_24.cpp $(LIBS)
+
+fig_16_25 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_25.exe fig_16_25.cpp $(LIBS)
+
+fig_16_26 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_16_26.exe fig_16_26.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_16_04.exe fig_16_06.exe fig_16_09.exe fig_16_11.exe fig_16_14.exe fig_16_16.exe fig_16_17.exe fig_16_19.exe fig_16_20.exe fig_16_21.exe fig_16_22.exe fig_16_23.exe fig_16_24.exe fig_16_25.exe fig_16_26.exe fig_16_04.obj fig_16_06.obj fig_16_09.obj fig_16_11.obj fig_16_14.obj fig_16_16.obj fig_16_17.obj fig_16_19.obj fig_16_20.obj fig_16_21.obj fig_16_22.obj fig_16_23.obj fig_16_24.obj fig_16_25.obj fig_16_26.obj *.bmp *.txt out*.png
+
+.phony : 
+

@@ -1,0 +1,72 @@
+# Copyright (C) 2019 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /EHsc
+LIBS = tbb.lib
+
+all : fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality wavefront_v6_global
+
+fig_10_04 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_10_04.exe fig_10_04.cpp $(LIBS)
+
+fig_10_06 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_10_06.exe fig_10_06.cpp $(LIBS)
+
+fig_10_08 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_10_08.exe fig_10_08.cpp $(LIBS)
+
+fig_10_11-bypass : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_10_11-bypass.exe fig_10_11-bypass.cpp $(LIBS)
+
+fig_10_11 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_10_11.exe fig_10_11.cpp $(LIBS)
+
+fig_10_15 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_10_15.exe fig_10_15.cpp $(LIBS)
+
+wavefront_v0_DAG : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v0_DAG.exe wavefront_v0_DAG.cpp $(LIBS)
+
+wavefront_v1_addchild : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v1_addchild.exe wavefront_v1_addchild.cpp $(LIBS)
+
+wavefront_v2_feeder : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v2_feeder.exe wavefront_v2_feeder.cpp $(LIBS)
+
+wavefront_v3_blockstyle : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v3_blockstyle.exe wavefront_v3_blockstyle.cpp $(LIBS)
+
+wavefront_v4_recycle : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v4_recycle.exe wavefront_v4_recycle.cpp $(LIBS)
+
+wavefront_v5_locality : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v5_locality.exe wavefront_v5_locality.cpp $(LIBS)
+
+wavefront_v6_global : .phony
+	$(CXX) $(CXXFLAGS) /Fewavefront_v6_global.exe wavefront_v6_global.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_10_04.exe fig_10_06.exe fig_10_08.exe fig_10_11-bypass.exe fig_10_11.exe fig_10_15.exe wavefront_v0_DAG.exe wavefront_v1_addchild.exe wavefront_v2_feeder.exe wavefront_v3_blockstyle.exe wavefront_v4_recycle.exe wavefront_v5_locality.exe wavefront_v6_global.exe fig_10_04.obj fig_10_06.obj fig_10_08.obj fig_10_11-bypass.obj fig_10_11.obj fig_10_15.obj wavefront_v0_DAG.obj wavefront_v1_addchild.obj wavefront_v2_feeder.obj wavefront_v3_blockstyle.obj wavefront_v4_recycle.obj wavefront_v5_locality.obj wavefront_v6_global.obj *.bmp *.txt out*.png
+
+.phony : 
+

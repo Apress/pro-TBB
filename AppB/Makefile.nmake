@@ -1,0 +1,115 @@
+# Copyright (C) 2019 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /EHsc
+LIBS = tbb.lib
+LIBS2 = $(LIBS) tbbmalloc.lib
+
+!if ("$(CXX)" != "icl")
+QUIET_MS_COMPILER_ON_STL_ISSUES=/wd4180 -DSCL_SECURE_NO_WARNINGS
+!else
+QUIET_MS_COMPILER_ON_STL_ISSUES=
+!endif
+
+all : fig_B_08_parallel_do fig_B_11_parallel_for fig_B_12_parallel_for2 fig_B_15_parallel_for_each fig_B_17_parallel_invoke fig_B_21_parallel_pipeline fig_B_23_parallel_reduce fig_B_24_parallel_deterministic_reduce fig_B_27_parallel_scan fig_B_30_parallel_sort fig_B_33_pipeline fig_B_43_fg fig_B_48_fixed_pool fig_B_48_memory_pool fig_B_60_mutex fig_B_62_atomic fig_B_64_combinable fig_B_66_enumerable_thread_specific fig_B_68_flatten2d fig_B_69_tick_count fig_B_71_task_group fig_B_73_task_scheduler_init fig_B_78_exception_handling fig_B_81_parallel_STL hw_tst
+
+fig_B_08_parallel_do : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_08_parallel_do.exe fig_B_08_parallel_do.cpp $(LIBS)
+
+fig_B_11_parallel_for : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_11_parallel_for.exe fig_B_11_parallel_for.cpp $(LIBS)
+
+fig_B_12_parallel_for2 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_12_parallel_for2.exe fig_B_12_parallel_for2.cpp $(LIBS)
+
+fig_B_15_parallel_for_each : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_15_parallel_for_each.exe fig_B_15_parallel_for_each.cpp $(LIBS)
+
+fig_B_17_parallel_invoke : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_17_parallel_invoke.exe fig_B_17_parallel_invoke.cpp $(LIBS) $(QUIET_MS_COMPILER_ON_STL_ISSUES)
+
+fig_B_21_parallel_pipeline : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_21_parallel_pipeline.exe fig_B_21_parallel_pipeline.cpp $(LIBS)
+
+fig_B_23_parallel_reduce : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_23_parallel_reduce.exe fig_B_23_parallel_reduce.cpp $(LIBS)
+
+fig_B_24_parallel_deterministic_reduce : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_24_parallel_deterministic_reduce.exe fig_B_24_parallel_deterministic_reduce.cpp $(LIBS)
+
+fig_B_27_parallel_scan : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_27_parallel_scan.exe fig_B_27_parallel_scan.cpp $(LIBS)
+
+fig_B_30_parallel_sort : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_30_parallel_sort.exe fig_B_30_parallel_sort.cpp $(LIBS)
+
+fig_B_33_pipeline : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_33_pipeline.exe fig_B_33_pipeline.cpp $(LIBS)
+
+fig_B_43_fg : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_43_fg.exe fig_B_43_fg.cpp $(LIBS)
+
+fig_B_48_fixed_pool : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_48_fixed_pool.exe fig_B_48_fixed_pool.cpp $(LIBS2)
+
+fig_B_48_memory_pool : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_48_memory_pool.exe fig_B_48_memory_pool.cpp $(LIBS2)
+
+fig_B_60_mutex : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_60_mutex.exe fig_B_60_mutex.cpp $(LIBS)
+
+fig_B_62_atomic : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_62_atomic.exe fig_B_62_atomic.cpp $(LIBS)
+
+fig_B_64_combinable : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_64_combinable.exe fig_B_64_combinable.cpp $(LIBS)
+
+fig_B_66_enumerable_thread_specific : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_66_enumerable_thread_specific.exe fig_B_66_enumerable_thread_specific.cpp $(LIBS)
+
+fig_B_68_flatten2d : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_68_flatten2d.exe fig_B_68_flatten2d.cpp $(LIBS)
+
+fig_B_69_tick_count : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_69_tick_count.exe fig_B_69_tick_count.cpp $(LIBS)
+
+fig_B_71_task_group : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_71_task_group.exe fig_B_71_task_group.cpp $(LIBS)
+
+fig_B_73_task_scheduler_init : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_73_task_scheduler_init.exe fig_B_73_task_scheduler_init.cpp $(LIBS)
+
+fig_B_78_exception_handling : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_78_exception_handling.exe fig_B_78_exception_handling.cpp $(LIBS)
+
+fig_B_81_parallel_STL : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_B_81_parallel_STL.exe fig_B_81_parallel_STL.cpp $(LIBS)
+
+hw_tst : .phony
+	$(CXX) $(CXXFLAGS) /Fehw_tst.exe hw_tst.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_B_08_parallel_do.exe fig_B_11_parallel_for.exe fig_B_12_parallel_for2.exe fig_B_15_parallel_for_each.exe fig_B_17_parallel_invoke.exe fig_B_21_parallel_pipeline.exe fig_B_23_parallel_reduce.exe fig_B_24_parallel_deterministic_reduce.exe fig_B_27_parallel_scan.exe fig_B_30_parallel_sort.exe fig_B_33_pipeline.exe fig_B_43_fg.exe fig_B_48_fixed_pool.exe fig_B_48_memory_pool.exe fig_B_60_mutex.exe fig_B_62_atomic.exe fig_B_64_combinable.exe fig_B_66_enumerable_thread_specific.exe fig_B_68_flatten2d.exe fig_B_69_tick_count.exe fig_B_71_task_group.exe fig_B_73_task_scheduler_init.exe fig_B_78_exception_handling.exe fig_B_81_parallel_STL.exe hw_tst.exe fig_B_08_parallel_do.obj fig_B_11_parallel_for.obj fig_B_12_parallel_for2.obj fig_B_15_parallel_for_each.obj fig_B_17_parallel_invoke.obj fig_B_21_parallel_pipeline.obj fig_B_23_parallel_reduce.obj fig_B_24_parallel_deterministic_reduce.obj fig_B_27_parallel_scan.obj fig_B_30_parallel_sort.obj fig_B_33_pipeline.obj fig_B_43_fg.obj fig_B_48_fixed_pool.obj fig_B_48_memory_pool.obj fig_B_60_mutex.obj fig_B_62_atomic.obj fig_B_64_combinable.obj fig_B_66_enumerable_thread_specific.obj fig_B_68_flatten2d.obj fig_B_69_tick_count.obj fig_B_71_task_group.obj fig_B_73_task_scheduler_init.obj fig_B_78_exception_handling.obj fig_B_81_parallel_STL.obj hw_tst.obj *.bmp *.txt out*.png
+
+.phony : 
+

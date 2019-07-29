@@ -1,0 +1,42 @@
+# Copyright (C) 2019 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /EHsc
+LIBS = tbb.lib
+
+all : fig_14_02 fig_14_03 fig_14_04
+
+fig_14_02 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_14_02.exe fig_14_02.cpp $(LIBS)
+
+fig_14_03 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_14_03.exe fig_14_03.cpp $(LIBS)
+
+fig_14_04 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_14_04.exe fig_14_04.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_14_02.exe fig_14_03.exe fig_14_04.exe fig_14_02.obj fig_14_03.obj fig_14_04.obj *.bmp *.txt out*.png
+
+.phony : 
+

@@ -1,0 +1,105 @@
+# Copyright (C) 2019 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+# OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+CXX = icl
+CXXFLAGS = $(EXTRA_CXXFLAGS) /O2 /EHsc
+LIBS = tbb.lib
+
+all : fig_2_03 fig_2_04 fig_2_05 fig_2_06 fig_2_07 fig_2_08 fig_2_10 fig_2_11 fig_2_12 fig_2_14 fig_2_15 fig_2_16 fig_2_17 fig_2_18 fig_2_19 fig_2_20 fig_2_22 fig_2_23 fig_2_24 fig_2_27 fig_2_28 fig_2_30 sidebar_associativity sidebar_pfor_functor
+
+fig_2_03 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_03.exe fig_2_03.cpp $(LIBS)
+
+fig_2_04 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_04.exe fig_2_04.cpp $(LIBS)
+
+fig_2_05 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_05.exe fig_2_05.cpp $(LIBS)
+
+fig_2_06 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_06.exe fig_2_06.cpp $(LIBS)
+
+fig_2_07 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_07.exe fig_2_07.cpp $(LIBS)
+
+fig_2_08 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_08.exe fig_2_08.cpp $(LIBS)
+
+fig_2_10 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_10.exe fig_2_10.cpp $(LIBS)
+
+fig_2_11 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_11.exe fig_2_11.cpp $(LIBS)
+
+fig_2_12 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_12.exe fig_2_12.cpp $(LIBS)
+
+fig_2_14 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_14.exe fig_2_14.cpp $(LIBS)
+
+fig_2_15 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_15.exe fig_2_15.cpp $(LIBS)
+
+fig_2_16 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_16.exe fig_2_16.cpp $(LIBS)
+
+fig_2_17 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_17.exe fig_2_17.cpp $(LIBS)
+
+fig_2_18 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_18.exe fig_2_18.cpp $(LIBS)
+
+fig_2_19 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_19.exe fig_2_19.cpp $(LIBS)
+
+fig_2_20 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_20.exe fig_2_20.cpp $(LIBS)
+
+fig_2_22 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_22.exe fig_2_22.cpp $(LIBS)
+
+fig_2_23 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_23.exe fig_2_23.cpp $(LIBS)
+
+fig_2_24 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_24.exe fig_2_24.cpp $(LIBS)
+
+fig_2_27 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_27.exe fig_2_27.cpp $(LIBS)
+
+fig_2_28 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_28.exe fig_2_28.cpp $(LIBS)
+
+fig_2_30 : .phony
+	$(CXX) $(CXXFLAGS) /Fefig_2_30.exe fig_2_30.cpp $(LIBS)
+
+sidebar_associativity : .phony
+	$(CXX) $(CXXFLAGS) /Fesidebar_associativity.exe sidebar_associativity.cpp $(LIBS)
+
+sidebar_pfor_functor : .phony
+	$(CXX) $(CXXFLAGS) /Fesidebar_pfor_functor.exe sidebar_pfor_functor.cpp $(LIBS)
+
+clean : .phony
+	del /f fig_2_03.exe fig_2_04.exe fig_2_05.exe fig_2_06.exe fig_2_07.exe fig_2_08.exe fig_2_10.exe fig_2_11.exe fig_2_12.exe fig_2_14.exe fig_2_15.exe fig_2_16.exe fig_2_17.exe fig_2_18.exe fig_2_19.exe fig_2_20.exe fig_2_22.exe fig_2_23.exe fig_2_24.exe fig_2_27.exe fig_2_28.exe fig_2_30.exe sidebar_associativity.exe sidebar_pfor_functor.exe fig_2_03.obj fig_2_04.obj fig_2_05.obj fig_2_06.obj fig_2_07.obj fig_2_08.obj fig_2_10.obj fig_2_11.obj fig_2_12.obj fig_2_14.obj fig_2_15.obj fig_2_16.obj fig_2_17.obj fig_2_18.obj fig_2_19.obj fig_2_20.obj fig_2_22.obj fig_2_23.obj fig_2_24.obj fig_2_27.obj fig_2_28.obj fig_2_30.obj sidebar_associativity.obj sidebar_pfor_functor.obj *.bmp *.txt out*.png
+
+.phony : 
+
