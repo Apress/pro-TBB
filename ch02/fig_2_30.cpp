@@ -62,7 +62,7 @@ void fig_2_30() {
     /* tokens */ 8,
     /* make the left image filter */
     tbb::make_filter<void, Image>(
-      /* filter type */ tbb::filter::serial_in_order,
+      /* filter type */ tbb::filter_mode::serial_in_order,
       [&](tbb::flow_control& fc) -> Image {
         if (uint64_t frame_number = getNextFrameNumber()) {
           return getLeftImage(frame_number);
@@ -72,30 +72,30 @@ void fig_2_30() {
         }
       }) & 
     tbb::make_filter<Image, ImagePair>(
-      /* filter type */ tbb::filter::serial_in_order,
+      /* filter type */ tbb::filter_mode::serial_in_order,
       [&](Image left) -> ImagePair {
         return ImagePair(left, getRightImage(left.frameNumber));
       }) & 
     tbb::make_filter<ImagePair, ImagePair>(
-      /* filter type */ tbb::filter::parallel,
+      /* filter type */ tbb::filter_mode::parallel,
       [&](ImagePair p) -> ImagePair {
         increasePNGChannel(p.first, Image::redOffset, 10);
         return p;
       }) & 
     tbb::make_filter<ImagePair, ImagePair>(
-      /* filter type */ tbb::filter::parallel,
+      /* filter type */ tbb::filter_mode::parallel,
       [&](ImagePair p) -> ImagePair {
         increasePNGChannel(p.second, Image::blueOffset, 10);
         return p;
       }) & 
     tbb::make_filter<ImagePair, Image>(
-      /* filter type */ tbb::filter::parallel,
+      /* filter type */ tbb::filter_mode::parallel,
       [&](ImagePair p) -> Image {
         mergePNGImages(p.second, p.first);
         return p.second;
       }) & 
     tbb::make_filter<Image, void>(
-      /* filter type */ tbb::filter::parallel,
+      /* filter type */ tbb::filter_mode::parallel,
       [&](Image img) {
         img.write();
       }) 
@@ -176,7 +176,7 @@ void mergePNGImages(PNGImage& right, const PNGImage& left) {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });
