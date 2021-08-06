@@ -26,9 +26,9 @@ SPDX-License-Identifier: MIT
 #include <vector>
 
 #include <tbb/tbb.h>
-#include <pstl/execution>
-#include <pstl/algorithm>
-#include <pstl/numeric>
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
+#include <oneapi/dpl/numeric>
 
 //
 // For best performance when using the Intel compiler use
@@ -50,7 +50,7 @@ void fig_4_12_a() {
   for (int t = 0; t < num_trials; ++t) {
     warmupTBB();
     t0 = tbb::tick_count::now();
-    auto v = std::transform_reduce(pstl::execution::par,
+    auto v = std::transform_reduce(dpl::execution::par,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0,
@@ -64,7 +64,7 @@ void fig_4_12_a() {
       }
     );
     accumulateTime(t0, 3);
-    v += std::transform_reduce(pstl::execution::par_unseq,
+    v += std::transform_reduce(dpl::execution::par_unseq,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0,
@@ -83,7 +83,7 @@ void fig_4_12_a() {
       v += a[i]*b[i];
     }
     accumulateTime(t0, 0);
-    v += std::transform_reduce(pstl::execution::seq,
+    v += std::transform_reduce(dpl::execution::seq,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0,
@@ -97,7 +97,7 @@ void fig_4_12_a() {
       }
     );
     accumulateTime(t0, 1);
-    v += std::transform_reduce(pstl::execution::unseq,
+    v += std::transform_reduce(dpl::execution::unseq,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0,
@@ -128,13 +128,13 @@ void fig_4_12_b() {
   for (int t = 0; t < num_trials; ++t) {
     warmupTBB();
     t0 = tbb::tick_count::now();
-    auto v = std::transform_reduce(pstl::execution::par,
+    auto v = std::transform_reduce(dpl::execution::par,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0
     );
     accumulateTime(t0, 3);
-    v += std::transform_reduce(pstl::execution::par_unseq,
+    v += std::transform_reduce(dpl::execution::par_unseq,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0
@@ -145,13 +145,13 @@ void fig_4_12_b() {
       v += a[i]*b[i];
     }
     accumulateTime(t0, 0);
-    v += std::transform_reduce(pstl::execution::seq,
+    v += std::transform_reduce(dpl::execution::seq,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0
     );
     accumulateTime(t0, 1);
-    v += std::transform_reduce(pstl::execution::unseq,
+    v += std::transform_reduce(dpl::execution::unseq,
       /* in1 range */ a.begin(), a.end(),
       /* in2 range */ b.begin(),
       /* init */ 0.0
@@ -185,7 +185,7 @@ void dumpTimes() {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });

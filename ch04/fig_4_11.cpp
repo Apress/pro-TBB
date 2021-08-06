@@ -26,9 +26,9 @@ SPDX-License-Identifier: MIT
 #include <vector>
 
 #include <tbb/tbb.h>
-#include <pstl/execution>
-#include <pstl/algorithm>
-#include <pstl/numeric>
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
+#include <oneapi/dpl/numeric>
 
 //
 // For best performance when using the Intel compiler use
@@ -50,18 +50,18 @@ void fig_4_11() {
   for (int t = 0; t < num_trials; ++t) {
     warmupTBB();
     t0 = tbb::tick_count::now();
-    float sum = std::reduce(pstl::execution::par, a.begin(), a.end());
+    float sum = std::reduce(dpl::execution::par, a.begin(), a.end());
     accumulateTime(t0, 3);
-    sum += std::reduce(pstl::execution::par_unseq, a.begin(), a.end());
+    sum += std::reduce(dpl::execution::par_unseq, a.begin(), a.end());
     accumulateTime(t0, 4);
 #pragma novector
     for (int i = 0; i < n; ++i) {
       sum += a[i];
     }
     accumulateTime(t0, 0);
-    sum += std::reduce(pstl::execution::seq, a.begin(), a.end());
+    sum += std::reduce(dpl::execution::seq, a.begin(), a.end());
     accumulateTime(t0, 1);
-    sum += std::reduce(pstl::execution::unseq, a.begin(), a.end());
+    sum += std::reduce(dpl::execution::unseq, a.begin(), a.end());
     accumulateTime(t0, 2);
     if (sum != num_versions * n) 
       std::cout << "ERROR: sum is not correct" 
@@ -80,7 +80,7 @@ void fig_4_11_with_lambda() {
   for (int t = 0; t < num_trials; ++t) {
     warmupTBB();
     t0 = tbb::tick_count::now();
-    auto sum = std::reduce(pstl::execution::par,
+    auto sum = std::reduce(dpl::execution::par,
       /* in1 range */ a.begin(), a.end(),
       /* init */ 0.0,
       [](float ae, float be) -> float {
@@ -88,7 +88,7 @@ void fig_4_11_with_lambda() {
       }
     );
     accumulateTime(t0, 3);
-    sum += std::reduce(pstl::execution::par_unseq,
+    sum += std::reduce(dpl::execution::par_unseq,
       /* in1 range */ a.begin(), a.end(),
       /* init */ 0.0,
       [](float ae, float be) -> float {
@@ -101,7 +101,7 @@ void fig_4_11_with_lambda() {
       sum += a[i];
     }
     accumulateTime(t0, 0);
-    sum += std::reduce(pstl::execution::seq,
+    sum += std::reduce(dpl::execution::seq,
       /* in1 range */ a.begin(), a.end(),
       /* init */ 0.0,
       [](float ae, float be) -> float {
@@ -109,7 +109,7 @@ void fig_4_11_with_lambda() {
       }
     );
     accumulateTime(t0, 1);
-    sum += std::reduce(pstl::execution::unseq,
+    sum += std::reduce(dpl::execution::unseq,
       /* in1 range */ a.begin(), a.end(),
       /* init */ 0.0,
       [](float ae, float be) -> float {
@@ -145,7 +145,7 @@ void dumpTimes() {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });

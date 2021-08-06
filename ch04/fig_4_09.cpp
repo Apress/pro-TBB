@@ -25,8 +25,8 @@ SPDX-License-Identifier: MIT
 #include <iostream>
 
 #include <tbb/tbb.h>
-#include <pstl/execution>
-#include <pstl/algorithm>
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
 
 //
 // For best performance when using the Intel compiler use
@@ -36,9 +36,9 @@ SPDX-License-Identifier: MIT
 inline void fig_4_9(float * a, float * b, float * c) {
   const int M = 1024;
   std::for_each(
-    /* policy */ pstl::execution::par_unseq,
-    /* first */  tbb::counting_iterator<int>(0),
-    /* last */   tbb::counting_iterator<int>(M),
+    /* policy */ dpl::execution::par_unseq,
+    /* first */  dpl::counting_iterator<int>(0),
+    /* last */   dpl::counting_iterator<int>(M),
     [&a, &b, &c, M](int i) {
       for (int j = 0; j < M; ++j) {
         int c_index = i*M + j;
@@ -51,7 +51,7 @@ inline void fig_4_9(float * a, float * b, float * c) {
 }
 
 void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.001);
   });
@@ -93,8 +93,8 @@ template <int M, typename Policy>
 inline void mxm_template(const Policy& p, float * a, float * b, float * c) {
   std::for_each(
     /* policy */ p,
-    /* first */ tbb::counting_iterator<int>(0),
-    /* last */  tbb::counting_iterator<int>(M),
+    /* first */ dpl::counting_iterator<int>(0),
+    /* last */  dpl::counting_iterator<int>(M),
     [&a, &b, &c](int i) {
 #pragma novector
       for (int j = 0; j < M; ++j) {
@@ -138,10 +138,10 @@ void run_mxm_template(const Policy& p, const std::string& name) {
 }
 
 int main() {
-  run_mxm_template(pstl::execution::seq, "seq");
-  run_mxm_template(pstl::execution::unseq, "unseq");
+  run_mxm_template(dpl::execution::seq, "seq");
+  run_mxm_template(dpl::execution::unseq, "unseq");
   warmupTBB();
-  run_mxm_template(pstl::execution::par, "par");
+  run_mxm_template(dpl::execution::par, "par");
   warmupTBB();
   run_fig_4_9();
   std::cout << "Done." << std::endl;
