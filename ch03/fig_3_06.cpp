@@ -29,17 +29,18 @@ void fig_3_6() {
   tbb::flow::graph g;
 
   int count = 0;
-  tbb::flow::source_node<int> my_src{g, 
-    [&count](int& i) -> bool { 
+  tbb::flow::input_node<int> my_src{g, 
+    [&count]( tbb::flow_control &fc ) -> int { 
       const int limit = 3;
+      int i = -1;
       if (count < limit) {
         i = count++;
-        return true;
+        return i;
       } else {
-        return false;
+        fc.stop();
+        return i;
       }
-    },
-    false /* start inactive */ 
+    }
   };
   tbb::flow::function_node<int> my_node{g, 
     tbb::flow::unlimited,
@@ -71,7 +72,7 @@ void loop_with_try_put() {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });

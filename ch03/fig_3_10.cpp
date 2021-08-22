@@ -61,14 +61,17 @@ void fig_3_10() {
   tbb::flow::graph g;
 
   // step 2: create nodes
-  tbb::flow::source_node<uint64_t> frame_no_node{g,
-    [] (uint64_t& frame_number) -> bool {
-      if ((frame_number = getNextFrameNumber()))
-        return true;
-      else
-        return false;
-    },
-    false
+  tbb::flow::input_node<uint64_t> frame_no_node{g,
+    []( tbb::flow_control &fc ) -> uint64_t {
+      uint64_t frame_number = getNextFrameNumber();
+      if (frame_number)
+        return frame_number;
+      else {
+        fc.stop();
+        return frame_number;
+      }
+        
+    }
   };
   tbb::flow::function_node<uint64_t, Image> get_left_node{g, 
     /* concurrency */ tbb::flow::serial,
@@ -207,7 +210,7 @@ void mergePNGImages(PNGImage& right, const PNGImage& left) {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });
