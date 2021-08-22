@@ -39,7 +39,7 @@ void fig_2_27(int num_tokens, std::ofstream& caseBeforeFile, std::ofstream& case
     /* tokens */ num_tokens,
     /* the get filter */
     tbb::make_filter<void, CaseStringPtr>(
-      /* filter node */ tbb::filter::serial_in_order,
+      /* filter node */ tbb::filter_mode::serial_in_order,
       /* filter body */
       [&](tbb::flow_control& fc) -> CaseStringPtr {
         CaseStringPtr s_ptr = getCaseString(caseBeforeFile);
@@ -49,7 +49,7 @@ void fig_2_27(int num_tokens, std::ofstream& caseBeforeFile, std::ofstream& case
       }) & // concatenation operation
     /* make the change case filter */
     tbb::make_filter<CaseStringPtr, CaseStringPtr>(
-      /* filter node */ tbb::filter::parallel,
+      /* filter node */ tbb::filter_mode::parallel,
       /* filter body */
       [](CaseStringPtr s_ptr) -> CaseStringPtr {
         std::transform(s_ptr->begin(), s_ptr->end(), s_ptr->begin(), 
@@ -65,7 +65,7 @@ void fig_2_27(int num_tokens, std::ofstream& caseBeforeFile, std::ofstream& case
       }) & // concatenation operation
     /* make the write filter */
     tbb::make_filter<CaseStringPtr, void>(
-      /* filter node */ tbb::filter::serial_in_order,
+      /* filter node */ tbb::filter_mode::serial_in_order,
       /* filter body */
       [&](CaseStringPtr s_ptr) -> void {
         writeCaseString(caseAfterFile, s_ptr);
@@ -116,14 +116,14 @@ void writeCaseString(std::ofstream& f, CaseStringPtr s) {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });
 }
 
 int main() {
-  int num_tokens = tbb::task_scheduler_init::default_num_threads(); 
+  int num_tokens = tbb::this_task_arena::max_concurrency(); 
   int num_strings = 100; 
   int string_len = 100000;
   int free_list_size = num_tokens;

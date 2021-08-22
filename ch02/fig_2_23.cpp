@@ -31,7 +31,7 @@ void fig_2_23(std::vector<double>& x, const std::vector<double>& a,
   const int N = x.size();
   const int block_size = 512;
   const int num_blocks = N / block_size;
-  std::vector<tbb::atomic<char>> ref_count(num_blocks*num_blocks);
+  std::vector<std::atomic<char>> ref_count(num_blocks*num_blocks);
   for (int r = 0; r < num_blocks; ++r) {
     for (int c = 0; c <= r; ++c) {
       if (r == 0 && c == 0) 
@@ -46,8 +46,8 @@ void fig_2_23(std::vector<double>& x, const std::vector<double>& a,
   using BlockIndex = std::pair<size_t, size_t>;
   BlockIndex top_left(0,0);
 
-  tbb::parallel_do( &top_left, &top_left+1, 
-    [&](const BlockIndex& bi, tbb::parallel_do_feeder<BlockIndex>& feeder) {
+  tbb::parallel_for_each( &top_left, &top_left+1, 
+    [&](const BlockIndex& bi, tbb::feeder<BlockIndex>& feeder) {
       size_t r = bi.first;
       size_t c = bi.second;
       int i_start = r*block_size, i_end = i_start + block_size;
@@ -97,7 +97,7 @@ static std::vector<double> initForwardSubstitution(std::vector<double>& x,
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });

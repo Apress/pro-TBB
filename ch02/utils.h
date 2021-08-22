@@ -64,7 +64,7 @@ static void spinWaitForAtLeast(double sec) {
   while ((tbb::tick_count::now() - t0).seconds() < sec);
 }
 
-static void warmupTBB(double per_body_time = 0.01, int P = tbb::task_scheduler_init::default_num_threads()) {
+static void warmupTBB(double per_body_time = 0.01, int P = tbb::this_task_arena::max_concurrency()) {
   tbb::parallel_for(0, P, [per_body_time](int) {
     spinWaitForAtLeast(per_body_time);
   });
