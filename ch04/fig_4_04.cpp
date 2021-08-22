@@ -26,8 +26,8 @@ SPDX-License-Identifier: MIT
 #include <vector>
 
 #include <tbb/tbb.h>
-#include <pstl/execution>
-#include <pstl/algorithm>
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
 
 //
 // For best performance when using the Intel compiler use
@@ -50,12 +50,12 @@ void fig_4_4() {
   for (int t = 0; t < num_trials; ++t) {
     warmupTBB();
     t0 = tbb::tick_count::now();
-    std::for_each(pstl::execution::par, v.begin(), v.end(), 
+    std::for_each(dpl::execution::par, v.begin(), v.end(), 
       [](float& i) {
         f(i);
       });
     accumulateTime(t0, 4);
-    std::for_each(pstl::execution::par_unseq, v.begin(), v.end(), 
+    std::for_each(dpl::execution::par_unseq, v.begin(), v.end(), 
       [](float& i) {
         f(i);
       });
@@ -75,12 +75,12 @@ void fig_4_4() {
         f(i);
       });
     accumulateTime(t0, 1);
-    std::for_each(pstl::execution::seq, v.begin(), v.end(), 
+    std::for_each(dpl::execution::seq, v.begin(), v.end(), 
       [](float& i) {
         f(i);
       });
     accumulateTime(t0, 2);
-    std::for_each(pstl::execution::unseq, v.begin(), v.end(), 
+    std::for_each(dpl::execution::unseq, v.begin(), v.end(), 
       [](float& i) {
         f(i);
       });
@@ -119,7 +119,7 @@ void validateResults(int num_trials, const std::vector<float>& v) {
 }
 
 void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.001);
   });

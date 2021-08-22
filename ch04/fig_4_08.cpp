@@ -26,8 +26,8 @@ SPDX-License-Identifier: MIT
 #include <vector>
 
 #include <tbb/tbb.h>
-#include <pstl/execution>
-#include <pstl/algorithm>
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
 
 //
 // For best performance when using the Intel compiler use
@@ -47,17 +47,17 @@ void fig_4_8a() {
   for (int t = 0; t < num_trials; ++t) {
     warmupTBB();
     t0 = tbb::tick_count::now();
-    std::for_each(pstl::execution::par,
-                  tbb::counting_iterator<int>(0), 
-                  tbb::counting_iterator<int>(n), 
+    std::for_each(dpl::execution::par,
+                  dpl::counting_iterator<int>(0), 
+                  dpl::counting_iterator<int>(n), 
       [&a, &b](int i) {
         a[i] = a[i] + b[i]*b[i];
       }
     );
     accumulateTime(t0, 4);
-    std::for_each(pstl::execution::par_unseq,
-                  tbb::counting_iterator<int>(0), 
-                  tbb::counting_iterator<int>(n), 
+    std::for_each(dpl::execution::par_unseq,
+                  dpl::counting_iterator<int>(0), 
+                  dpl::counting_iterator<int>(n), 
       [&a, &b](int i) {
         a[i] = a[i] + b[i]*b[i];
       }
@@ -74,24 +74,24 @@ void fig_4_8a() {
       a[i] = a[i] + b[i]*b[i];
     }
     accumulateTime(t0, 0);
-    std::for_each(tbb::counting_iterator<int>(0), 
-                  tbb::counting_iterator<int>(n), 
+    std::for_each(dpl::counting_iterator<int>(0), 
+                  dpl::counting_iterator<int>(n), 
       [&a, &b](int i) {
         a[i] = a[i] + b[i]*b[i];
       }
     );
     accumulateTime(t0, 1);
-    std::for_each(pstl::execution::seq,
-                  tbb::counting_iterator<int>(0), 
-                  tbb::counting_iterator<int>(n), 
+    std::for_each(dpl::execution::seq,
+                  dpl::counting_iterator<int>(0), 
+                  dpl::counting_iterator<int>(n), 
       [&a, &b](int i) {
         a[i] = a[i] + b[i]*b[i];
       }
     );
     accumulateTime(t0, 2);
-    std::for_each(pstl::execution::unseq,
-                  tbb::counting_iterator<int>(0), 
-                  tbb::counting_iterator<int>(n), 
+    std::for_each(dpl::execution::unseq,
+                  dpl::counting_iterator<int>(0), 
+                  dpl::counting_iterator<int>(n), 
       [&a, &b](int i) {
         a[i] = a[i] + b[i]*b[i];
       }
@@ -109,12 +109,12 @@ void fig_4_8b() {
   std::vector<float> a(n, 1.0), b(n, 3.0);
 
   for (int t = 0; t < num_trials; ++t) {
-    auto begin = tbb::make_zip_iterator(a.begin(), b.begin());
-    auto end = tbb::make_zip_iterator(a.end(), b.end());
+    auto begin = dpl::make_zip_iterator(a.begin(), b.begin());
+    auto end = dpl::make_zip_iterator(a.end(), b.end());
 
     warmupTBB();
     t0 = tbb::tick_count::now();
-    std::for_each(pstl::execution::par, begin, end,
+    std::for_each(dpl::execution::par, begin, end,
       [](const std::tuple<float&, float&>& v) {
         float& a = std::get<0>(v); 
         float b = std::get<1>(v); 
@@ -122,7 +122,7 @@ void fig_4_8b() {
       }
     );
     accumulateTime(t0, 4);
-    std::for_each(pstl::execution::par_unseq, begin, end,
+    std::for_each(dpl::execution::par_unseq, begin, end,
       [](const std::tuple<float&, float&>& v) {
         float& a = std::get<0>(v); 
         float b = std::get<1>(v); 
@@ -149,7 +149,7 @@ void fig_4_8b() {
       }
     );
     accumulateTime(t0, 1);
-    std::for_each(pstl::execution::seq, begin, end,
+    std::for_each(dpl::execution::seq, begin, end,
       [](const std::tuple<float&, float&>& v) {
         float& a = std::get<0>(v); 
         float b = std::get<1>(v); 
@@ -157,7 +157,7 @@ void fig_4_8b() {
       }
     );
     accumulateTime(t0, 2);
-    std::for_each(pstl::execution::unseq, begin, end,
+    std::for_each(dpl::execution::unseq, begin, end,
       [](const std::tuple<float&, float&>& v) {
         float& a = std::get<0>(v); 
         float b = std::get<1>(v); 
@@ -177,26 +177,26 @@ void fig_4_8c() {
   std::vector<float> a(n, 1.0), b(n, 3.0);
 
   for (int t = 0; t < num_trials; ++t) {
-    auto zbegin = tbb::make_zip_iterator(a.begin(), b.begin());
-    auto zend = tbb::make_zip_iterator(a.end(), b.end());
+    auto zbegin = dpl::make_zip_iterator(a.begin(), b.begin());
+    auto zend = dpl::make_zip_iterator(a.end(), b.end());
 
     auto square_b = [](const std::tuple<float&, float&>& v) {
       float b = std::get<1>(v);
       return std::tuple<float&, float>(std::get<0>(v), b*b);
     };
-    auto begin = tbb::make_transform_iterator(zbegin, square_b); /* requires TBB 2019 update 3 (December 2018) or later */
-    auto end = tbb::make_transform_iterator(zend, square_b);
+    auto begin = dpl::make_transform_iterator(zbegin, square_b); /* requires TBB 2019 update 3 (December 2018) or later */
+    auto end = dpl::make_transform_iterator(zend, square_b);
 
     warmupTBB();
     t0 = tbb::tick_count::now();
-    std::for_each(pstl::execution::par, begin, end,
+    std::for_each(dpl::execution::par, begin, end,
       [](const std::tuple<float&, float>& v) {
         float& a = std::get<0>(v); 
         a = a + std::get<1>(v);
       }
     );
     accumulateTime(t0, 4);
-    std::for_each(pstl::execution::par_unseq, begin, end,
+    std::for_each(dpl::execution::par_unseq, begin, end,
       [](const std::tuple<float&, float>& v) {
         float& a = std::get<0>(v); 
         a = a + std::get<1>(v);
@@ -221,14 +221,14 @@ void fig_4_8c() {
       }
     );
     accumulateTime(t0, 1);
-    std::for_each(pstl::execution::seq, begin, end,
+    std::for_each(dpl::execution::seq, begin, end,
       [](const std::tuple<float&, float>& v) {
         float& a = std::get<0>(v); 
         a = a + std::get<1>(v);
       }
     );
     accumulateTime(t0, 2);
-    std::for_each(pstl::execution::unseq, begin, end,
+    std::for_each(dpl::execution::unseq, begin, end,
       [](const std::tuple<float&, float>& v) {
         float& a = std::get<0>(v); 
         a = a + std::get<1>(v);
@@ -271,7 +271,7 @@ void validateResults(int num_trials, const std::vector<float>& a) {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
+  tbb::parallel_for(0, tbb::this_task_arena::max_concurrency(), [](int) {
     tbb::tick_count t0 = tbb::tick_count::now();
     while ((tbb::tick_count::now() - t0).seconds() < 0.01);
   });
