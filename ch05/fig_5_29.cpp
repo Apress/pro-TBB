@@ -25,10 +25,10 @@ SPDX-License-Identifier: MIT
 #include <vector>
 #include <iostream>
 #include <algorithm>
-
+#include <atomic>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
-#include <tbb/task_scheduler_init.h>
+#include <tbb/tick_count.h>
 #include <tbb/cache_aligned_allocator.h>
 #include <tbb/enumerable_thread_specific.h>
 #include <tbb/parallel_reduce.h>
@@ -40,7 +40,6 @@ int main(int argc, char** argv) {
   int nth = 2;
 
   std::cout<<"Par_count with N: " << N << " and nth: "<< nth <<std::endl;
-  tbb::task_scheduler_init init{nth};
 
   //for (int test = 0; test < 10 ; ++test)
   //{
@@ -111,7 +110,7 @@ int main(int argc, char** argv) {
 
   // Parallel execution (atomic)
   t0_p = tbb::tick_count::now();
-  tbb::atomic<long long> sum_a{0};
+  std::atomic<long long> sum_a{0};
   parallel_for(tbb::blocked_range<size_t>{0, N},
     [&](const tbb::blocked_range<size_t>& r)
     {

@@ -26,21 +26,22 @@ SPDX-License-Identifier: MIT
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <atomic>
 
-#include <tbb/task_scheduler_init.h>
 #include <tbb/tick_count.h>
-#include <tbb/atomic.h>
 #include <tbb/parallel_invoke.h>
 
 
-alignas(64) tbb::atomic<uint32_t> v{1};
+alignas(64) std::atomic<uint32_t> v{1};
 
-void fetch_and_triple(tbb::atomic<uint32_t>& v)
+void fetch_and_triple(std::atomic<uint32_t>& v)
 {
   uint32_t old_v;
+  uint32_t new_v;
   do {
     old_v=v; //take a snapshot
-  } while (v.compare_and_swap(old_v * 3, old_v)!=old_v);
+    new_v=v*3;
+  } while (!v.compare_exchange_strong(old_v, new_v));
 }
 
 int main(int argc, char** argv)
@@ -49,7 +50,6 @@ int main(int argc, char** argv)
   int nth = 2 ;
 
   std::cout<< "N="<< N << " and nth=" << nth << "\t";
-  tbb::task_scheduler_init init{nth};
 
   tbb::parallel_invoke(
     [&](){for(int i=0; i<N; ++i) fetch_and_triple(v);},
