@@ -21,13 +21,11 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 
 SPDX-License-Identifier: MIT
 */
-
-#include <iostream>
-#include <vector>
-
-#include <tbb/tbb.h>
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/algorithm>
+#include <iostream>
+#include <vector>
+#include <tbb/tbb.h>
 
 //
 // For best performance when using the Intel compiler use

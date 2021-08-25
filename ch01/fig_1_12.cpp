@@ -22,11 +22,11 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 SPDX-License-Identifier: MIT
 */
 
+#include <oneapi/dpl/algorithm>
+#include <oneapi/dpl/execution>
 #include <iostream>
 #include <vector>
 #include <tbb/tbb.h>
-#include <oneapi/dpl/algorithm>
-#include <oneapi/dpl/execution>
 #include "ch01.h"
 
 using ImagePtr = std::shared_ptr<ch01::Image>;
