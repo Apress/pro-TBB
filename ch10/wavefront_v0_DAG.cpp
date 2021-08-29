@@ -24,12 +24,17 @@ SPDX-License-Identifier: MIT
 
 #include <iostream>
 #include <tbb/tick_count.h>
-#include <tbb/task.h>
-#include <tbb/task_scheduler_init.h>
+// NOTE: task API is removed. 
+// DAG of tasks has been replaced by a DAG of FlowGraph continue_node
+#include <tbb/flow_graph.h>
+#include <tbb/global_control.h>
 #include <atomic>
 /*#include <unistd.h>*/
 #include <vector>
 #include "utils.h"
+
+using Cell = tbb::flow::continue_node<tbb::flow::continue_msg>;
+using CellPtr = std::shared_ptr<Cell>;
 
 double foo (int gs, double a, double b, double c){
       double x = (a + b + c)/3;
@@ -41,35 +46,31 @@ double foo (int gs, double a, double b, double c){
       return x;
 }
 
-//Task class
-class Cell: public tbb::task {
-  int i,j;
-  int n;
-  int gs;
-  std::vector<double>& A;
-public:
-  // successor[0] = south successor, successor[1] = east successor
-  Cell* successor[2];
-  Cell(int i_ ,int j_, int n_, int gs_,
-       std::vector<double>& A_) :
-       i{i_},j{j_},n{n_},gs{gs_},A{A_} {}
-  task* execute(){
-    A[i*n+j] = foo(gs, A[i*n+j], A[(i-1)*n+j], A[i*n+j-1]);
-    for( int k=0; k<2; ++k )
-      if(Cell* t = successor[k])
-        if(t->decrement_ref_count()==0)
-          spawn(*t);
-    return nullptr;
-  }
-};
+CellPtr createCell(tbb::flow::graph& g, int i, int j, int n, int gs, 
+                   std::vector<double>& A) {
+  return std::make_shared<Cell>(g,
+    [i, j, n, gs, &A] (const tbb::flow::continue_msg& msg) {
+      A[i*n+j] = foo(gs, A[i*n+j], A[(i-1)*n+j], A[i*n+j-1]);
+      return msg;
+    }
+  );
+}
+
+void addEdges(std::vector<CellPtr>& cells, int i, int j, int n) {
+  CellPtr cp = cells[i*n + j];
+  if (j + 1 < n)
+    tbb::flow::make_edge(*cp, *cells[i*n + j + 1]);
+  if (i + 1 < n)
+    tbb::flow::make_edge(*cp, *cells[(i + 1)*n + j]);
+}
 
 int main (int argc, char **argv)
 {
-  int n = 1000;
-  int nth= 4;
-  int gs= 50;
+  constexpr int n = 1000;
+  constexpr size_t nth = 4;
+  constexpr int gs = 50;
 
-  int size = n*n;
+  constexpr int size = n*n;
   std::vector<double> a_ser(size);
   std::vector<double> a_par(size);
 
@@ -87,29 +88,22 @@ int main (int argc, char **argv)
   auto t1 = tbb::tick_count::now();
   auto t_ser = (t1-t0).seconds()*1000;
 
-  tbb::task_scheduler_init init(nth);
+  tbb::global_control global_limit{tbb::global_control::max_allowed_parallelism, nth};
   common::warmupTBB(0.01, nth);
   // Build DAG of Cells
-  std::vector<Cell*> DAG(size);
-  for( int i=n; --i>0; )
-      for( int j=n; --j>0; ) {
-          DAG[i*n+j] = new(tbb::task::allocate_root())
-                          Cell(i,j,n,gs,a_par);
-          DAG[i*n+j]->successor[0] = i+1<n ? DAG[(i+1)*n+j] : nullptr;
-          DAG[i*n+j]->successor[1] = j+1<n ? DAG[i*n+j+1] : nullptr;
-          DAG[i*n+j]->set_ref_count((i>1)+(j>1));
-      }
-  // Add extra reference to last task, because it is waited on
-  // by spawn_and_wait_for_all.
-  DAG[size-1]->increment_ref_count();
+  std::vector<CellPtr> cells(size);
+  tbb::flow::graph g;
+  for (int i = n - 1; i > 0; --i) {
+    for (int j = n - 1; j > 0; --j) {
+      cells[i*n + j] = createCell(g, i, j, n, gs, a_par);
+      addEdges(cells, i, j, n);
+    }
+  }
 
   t0 = tbb::tick_count::now();
-  // Wait for all but last task to complete.
-  DAG[size-1]->spawn_and_wait_for_all(*DAG[n+1]);
-  // Last task is not executed implicitly, so execute it explicitly.
-  DAG[size-1]->execute();
-  // Destroy last task.
-  tbb::task::destroy(*DAG[size-1]);
+  // Wait for all tasks to complete.
+  cells[n+1]->try_put(tbb::flow::continue_msg{});
+  g.wait_for_all();
   t1 = tbb::tick_count::now();
   auto t_par = (t1-t0).seconds()*1000;
 
