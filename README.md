@@ -2,7 +2,7 @@
 
 Source code of the examples provided in each chapter of the TBB book (2019).
 
-**This branch is a WORK IN PROGRESS to update examples our 2019 book (TBB) for the forthcoming 2022 book (oneTBB)**
+**This branch is ABANDONED - do not use - we will retire (delete it)**
 
 Makefiles default to use of Intel C++ compiler, but specifying a CXX definition
 on the command line can change the compilation to be with Microsoft (CXX=cl),
