@@ -23,11 +23,15 @@ SPDX-License-Identifier: MIT
 */
 
 #include <iostream>
-#include <tbb/task.h>
+// NOTE: low-level task API REMOVED in oneTBB
+// Use task_group instead:
+#include <tbb/task_group.h>
 #include <tbb/tick_count.h>
-#include <tbb/task_scheduler_init.h>
+// NOTE: task_scheduler_init REMOVED in oneTBB
+// Use global_control instead:
+#include <tbb/global_control.h>
 
-int cutoff = 30;
+constexpr int cutoff = 30;
 
 long fib(long n) {
   if(n<2)
@@ -36,12 +40,13 @@ long fib(long n) {
     return fib(n-1)+fib(n-2);
 }
 
-class FibTask: public tbb::task {
+class FibTask {
 public:
   long const n;
   long* const sum;
+  
   FibTask(long n_, long* sum_) : n{n_}, sum{sum_} {}
-  tbb::task* execute() { // Overrides virtual function task::execute
+  void operator()() const { // Overrides virtual function task::execute
     if(n<cutoff) {
       *sum = fib(n);
     }
@@ -54,43 +59,43 @@ public:
       std::cout << " dir y: " << &y;
       std::cout << " dir sum: " << sum <<std::endl;
 #endif
-      FibTask& a = *new(tbb::task::allocate_child()) FibTask{n-1, &x};
-      FibTask& b = *new(tbb::task::allocate_child()) FibTask{n-2, &y};
-      // Set ref_count to "two children plus one for the wait".
-      tbb::task::set_ref_count(3);
-      // Start b running.
-      tbb::task::spawn(b);
-      // Start a running and wait for all children (a and b).
-      tbb::task::spawn_and_wait_for_all(a);
+      // New task_group so that you can wait for it
+      tbb::task_group tg;
+      tg.run(FibTask{n-1, &x});
+      tg.run(FibTask{n-2, &y});
+      // Wait for both children.
+      tg.wait();
       // Do the sum
       *sum = x+y;
     }
-    return nullptr;
+    return;
   }
 };
 
 long parallel_fib(long n) {
   long sum = 0;
-  FibTask& a = *new(tbb::task::allocate_root()) FibTask{n,&sum};
-  tbb::task::spawn_root_and_wait(a);
+  tbb::task_group tg;
+  tg.run(FibTask{n, &sum});
+  tg.wait();
   return sum;
 }
 
 int main(int argc, char** argv)
 {
-int n = 30;
-int nth = 4;
+int n = 40;
+size_t nth = 8;
 #ifdef SHOWPOINTERS
   nth=1;
 #endif
 
-tbb::task_scheduler_init init{nth};
+tbb::global_control global_limit{tbb::global_control::max_allowed_parallelism, nth};
 
 auto t0 = tbb::tick_count::now();
 long fib_s = fib(n);
 auto t1 = tbb::tick_count::now();
 long fib_p = parallel_fib(n);
 auto t2 = tbb::tick_count::now();
+
 double t_s = (t1 - t0).seconds();
 double t_p = (t2 - t1).seconds();
 

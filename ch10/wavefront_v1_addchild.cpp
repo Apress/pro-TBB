@@ -24,9 +24,9 @@ SPDX-License-Identifier: MIT
 
 #include <iostream>
 #include <tbb/tick_count.h>
-#include <tbb/task.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/atomic.h>
+#include <tbb/task_group.h>
+#include <tbb/global_control.h>
+#include <atomic>
 /*#include <unistd.h>*/
 #include <vector>
 #include "utils.h"
@@ -42,39 +42,39 @@ double foo (int gs, double a, double b, double c){
 }
 
 //Task class
-class Cell: public tbb::task {
+class Cell {
   int i,j;
   int n;
   int gs;
   std::vector<double>& A;
-  std::vector<tbb::atomic<int>>& counters;
+  std::vector<std::atomic<int>>& counters;
+  tbb::task_group& tg;
 public:
   Cell(int i_ ,int j_, int n_, int gs_,
        std::vector<double>& A_,
-       std::vector<tbb::atomic<int>>& counters_) :
-       i{i_},j{j_},n{n_},gs{gs_},A{A_},counters{counters_} {}
-  task* execute(){
+       std::vector<std::atomic<int>>& counters_,
+       tbb::task_group& tg_) :
+       i{i_},j{j_},n{n_},gs{gs_},A{A_},counters{counters_},tg{tg_} {}
+  void operator()() const {
     A[i*n+j] = foo(gs, A[i*n+j], A[(i-1)*n+j], A[i*n+j-1]);
     if (j<n-1 && --counters[i*n+j+1]==0) // east cell ready
-        spawn(*new(allocate_additional_child_of(*parent()))
-              Cell{i,j+1,n,gs,A,counters});
+        tg.run(Cell{i,j+1,n,gs,A,counters,tg});
     if (i<n-1 && --counters[(i+1)*n+j]==0) // south cell ready
-        spawn(*new(allocate_additional_child_of(*parent()))
-              Cell{i+1,j,n,gs,A,counters});
-    return nullptr;
+        tg.run(Cell{i+1,j,n,gs,A,counters,tg});
+    return;
   }
 };
 
 int main (int argc, char **argv)
 {
   int n = 1000;
-  int nth= 4;
-  int gs= 50;
+  size_t nth = 4;
+  int gs = 50;
 
   int size = n*n;
   std::vector<double> a_ser(size);
   std::vector<double> a_par(size);
-  std::vector<tbb::atomic<int>> counters(size);
+  std::vector<std::atomic<int>> counters(size);
 
   //Initialize a_ser & a_par with dummy values
   for(int i=0; i<size; i++)
@@ -101,12 +101,13 @@ int main (int argc, char **argv)
       }
   counters[n+1] = 0; //counters(1,1)
 
-  tbb::task_scheduler_init init(nth);
+  tbb::global_control global_limit{tbb::global_control::max_allowed_parallelism, nth};
   common::warmupTBB(0.01, nth);
 
+  tbb::task_group tg;
   t0 = tbb::tick_count::now();
-  tbb::task::spawn_root_and_wait(*new(tbb::task::allocate_root())
-                                 Cell{1,1,n,gs,a_par,counters});
+  tg.run(Cell{1,1,n,gs,a_par,counters,tg});
+  tg.wait();
   t1 = tbb::tick_count::now();
   auto t_par = (t1-t0).seconds()*1000;
 

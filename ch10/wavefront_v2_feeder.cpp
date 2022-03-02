@@ -24,9 +24,9 @@ SPDX-License-Identifier: MIT
 
 #include <iostream>
 #include <tbb/tick_count.h>
-#include <tbb/parallel_do.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/atomic.h>
+#include <tbb/parallel_for_each.h>
+#include <tbb/global_control.h>
+#include <atomic>
 /*#include <unistd.h>*/
 #include <vector>
 #include "utils.h"
@@ -48,13 +48,13 @@ class Cell{
   int n;
   int gs;
   std::vector<double>& A;
-  std::vector<tbb::atomic<int>>& counters;
+  std::vector<std::atomic<int>>& counters;
 public:
   Cell(int n_, int gs_,
        std::vector<double>& A_,
-       std::vector<tbb::atomic<int>>& counters_) :
+       std::vector<std::atomic<int>>& counters_) :
        n{n_},gs{gs_},A{A_},counters{counters_} {}
-  void operator()(task_t& id, tbb::parallel_do_feeder<task_t>& feeder) const{
+  void operator()(task_t& id, tbb::feeder<task_t>& feeder) const{
     int i = id.first;
 		int j = id.second;
     A[i*n+j] = foo(gs, A[i*n+j], A[(i-1)*n+j], A[i*n+j-1]);
@@ -68,13 +68,13 @@ public:
 int main (int argc, char **argv)
 {
   int n = 1000;
-  int nth= 4;
-  int gs= 50;
+  size_t nth = 4;
+  int gs = 50;
 
   int size = n*n;
   std::vector<double> a_ser(size);
   std::vector<double> a_par(size);
-  std::vector<tbb::atomic<int>> counters(size);
+  std::vector<std::atomic<int>> counters(size);
 
   //Initialize a_ser & a_par with dummy values
   for(int i=0; i<size; i++)
@@ -101,12 +101,12 @@ int main (int argc, char **argv)
       }
   counters[n+1] = 0; //counters(1,1)
 
-  tbb::task_scheduler_init init(nth);
+  tbb::global_control global_limit{tbb::global_control::max_allowed_parallelism, nth};
   common::warmupTBB(0.01, nth);
 
   t0 = tbb::tick_count::now();
   task_t origin(1,1);
-	tbb::parallel_do(&origin, &origin+1, Cell(n,gs,a_par,counters));
+	tbb::parallel_for_each(&origin, &origin+1, Cell(n,gs,a_par,counters));
   t1 = tbb::tick_count::now();
   auto t_par = (t1-t0).seconds()*1000;
 
