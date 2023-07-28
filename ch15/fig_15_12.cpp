@@ -49,7 +49,7 @@ int main(){
   for(int i=0; i<N ; i++)
     for(int j=0;  j<N; j++){
       if(data[i][j]) std::cout << i << "  " << j << " : true " << std::endl;
-      //if(!data[i][j]) cout<< i << "  " << j << " : false " << endl;
+      //if(!data[i][j]) std::cout<< i << "  " << j << " : false " << std::endl;
     }
   return 0;
 }

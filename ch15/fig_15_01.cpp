@@ -29,8 +29,8 @@ SPDX-License-Identifier: MIT
 
 int main(int argc, char** argv) {
   int n = 1000;
-  int nth = 4;
-  tbb::task_scheduler_init init{nth};
+  size_t nth = 4;
+  tbb::global_control global_limit{tbb::global_control::max_allowed_parallelism, nth};
 
   std::vector<int> data(n);
   data[500] = -2;
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
         for(int i=r.begin(); i!=r.end(); ++i){
           if(data[i] == -2) {
             index = i;
-            tbb::task::self().cancel_group_execution();
+            tbb::task::current_context()->cancel_group_execution();
             break;
           }
         }
