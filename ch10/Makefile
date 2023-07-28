@@ -12,7 +12,7 @@
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.ï¿½ IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 # OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
@@ -22,7 +22,7 @@
 
 CXX = icc
 LIBS = -ltbb -ltbbmalloc_proxy
-CXXFLAGS = $(EXTRA_CXXFLAGS) -std=c++11 -O3
+CXXFLAGS = $(EXTRA_CXXFLAGS) -std=c++17 -O3
 LIBS = -ltbb -ltbbmalloc_proxy
 
 # \
@@ -34,9 +34,9 @@ _printmsg:  # \
 # \
 !else
 
-.PHONY : all clean fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality wavefront_v6_global
+.PHONY : all clean fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality
 
-all : fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality wavefront_v6_global
+all : fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality
 
 fig_10_04 :
 	$(CXX) $(CXXFLAGS) -o fig_10_04 fig_10_04.cpp $(LIBS)
@@ -74,11 +74,8 @@ wavefront_v4_recycle :
 wavefront_v5_locality :
 	$(CXX) $(CXXFLAGS) -o wavefront_v5_locality wavefront_v5_locality.cpp $(LIBS)
 
-wavefront_v6_global :
-	$(CXX) $(CXXFLAGS) -o wavefront_v6_global wavefront_v6_global.cpp $(LIBS)
-
 clean :
-	rm -f fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality wavefront_v6_global fig_10_04.o fig_10_06.o fig_10_08.o fig_10_11-bypass.o fig_10_11.o fig_10_15.o wavefront_v0_DAG.o wavefront_v1_addchild.o wavefront_v2_feeder.o wavefront_v3_blockstyle.o wavefront_v4_recycle.o wavefront_v5_locality.o wavefront_v6_global.o *.bmp *.txt out*.png
+	rm -f fig_10_04 fig_10_06 fig_10_08 fig_10_11-bypass fig_10_11 fig_10_15 wavefront_v0_DAG wavefront_v1_addchild wavefront_v2_feeder wavefront_v3_blockstyle wavefront_v4_recycle wavefront_v5_locality fig_10_04.o fig_10_06.o fig_10_08.o fig_10_11-bypass.o fig_10_11.o fig_10_15.o wavefront_v0_DAG.o wavefront_v1_addchild.o wavefront_v2_feeder.o wavefront_v3_blockstyle.o wavefront_v4_recycle.o wavefront_v5_locality.o *.bmp *.txt out*.png
 
 # \
 !endif
