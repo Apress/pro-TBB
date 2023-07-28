@@ -24,10 +24,7 @@ SPDX-License-Identifier: MIT
 
 #include <iostream>
 #include <tbb/tick_count.h>
-#include <tbb/task.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/atomic.h>
-/*#include <unistd.h>*/
+#include <atomic>
 #include <vector>
 #include "utils.h"
 
@@ -42,6 +39,7 @@ double foo (int gs, double a, double b, double c){
 }
 
 //Task class
+/*
 class Cell: public tbb::task {
   int i,j;
   int n;
@@ -77,6 +75,7 @@ public:
     else return nullptr;
   }
 };
+*/
 
 
 int main (int argc, char **argv)
@@ -88,7 +87,7 @@ int main (int argc, char **argv)
   int size = n*n;
   std::vector<double> a_ser(size);
   std::vector<double> a_par(size);
-  std::vector<tbb::atomic<int>> counters(size);
+//  std::vector<std::atomic<int>> counters(size);
 
   //Initialize a_ser & a_par with dummy values
   for(int i=0; i<size; i++)
@@ -104,32 +103,11 @@ int main (int argc, char **argv)
   auto t1 = tbb::tick_count::now();
   auto t_ser = (t1-t0).seconds()*1000;
 
-  //Initialize matrix of counters
-  for(int i=0; i<n; i++)
-    for (int j=0; j<n; j++)
-      if (i == 1 || j==1) {
-        counters[i*n+j]=1;
-      }
-      else {
-        counters[i*n+j]=2;
-      }
-  counters[n+1] = 0;
-
-  tbb::task_scheduler_init init(nth);
-  common::warmupTBB(0.01, nth);
-
-  t0 = tbb::tick_count::now();
-  tbb::task::spawn_root_and_wait(*new(tbb::task::allocate_root())
-                                 Cell{1,1,n,gs,a_par,counters});
-  t1 = tbb::tick_count::now();
-  auto t_par = (t1-t0).seconds()*1000;
-
-  if (a_ser != a_par)
-      std::cerr << "Parallel computation failed!!" << std::endl;
-
   std::cout<<"Serial Time = " << t_ser <<" msec\n";
-  std::cout<<"Thrds = " << nth << "; Parallel Time = " << t_par << " msec\n";
-  std::cout<<"Speedup = " << t_ser/t_par << '\n';
+  std::cout << "Parallel Time not computed. Task API removed.\n";
+  std::cout << "Task_group alternative can be used following a bypassing approach,\n";
+  std::cout << "but this example can not be implemented directly with bypassing.\n";
+  std::cout << "See: https://oneapi-src.github.io/oneTBB/main/tbb_userguide/Migration_Guide/Task_API.html\n";
 
   return 0;
 }

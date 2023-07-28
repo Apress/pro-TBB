@@ -24,9 +24,8 @@ SPDX-License-Identifier: MIT
 
 #include <iostream>
 #include <tbb/tick_count.h>
-#include <tbb/task.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/atomic.h>
+#include <tbb/global_control.h>
+#include <atomic>
 /*#include <unistd.h>*/
 #include <vector>
 #include "utils.h"
@@ -41,7 +40,7 @@ double foo (int gs, double a, double b, double c){
       return x;
 }
 
-//Task class
+/* //Task class deprecated
 class Cell: public tbb::task {
   int i,j;
   int n;
@@ -77,18 +76,57 @@ public:
     else return nullptr;
   }
 };
+*/
 
+//Attempt to implement with task_group alternative, but not possible due to the operator() const is enforced
+/*
+class Cell {
+  int i,j; //Non-static member variable cannot be modified in a const member function
+  int n;
+  int gs;
+  std::vector<double>& A;
+  std::vector<std::atomic<int>>& counters;
+  tbb::task_group& tg;
+public:
+  Cell(int i_ ,int j_, int n_, int gs_,
+       std::vector<double>& A_,
+       std::vector<std::atomic<int>>& counters_, tbb::task_group& tg_) :
+       i{i_},j{j_},n{n_},gs{gs_},A{A_},counters{counters_}, tg{tg_} {}
+  void operator()() const { //const member function
+    A[i*n+j] = foo(gs, A[i*n+j], A[(i-1)*n+j], A[i*n+j-1]);
+    bool recycle_into_east=false;
+    bool recycle_into_south=false;
+    if (i<n-1 && --counters[(i+1)*n+j]==0) recycle_into_south=true;
+    if (j<n-1 && --counters[i*n+j+1]==0){
+        if (!recycle_into_south) recycle_into_east = true;
+        else
+          tg.run(Cell{i,j+1,n,gs,A,counters,tg});
+    }
+    if(recycle_into_south){
+      i=i+1; //Non-static member variable cannot be modified in a const member function
+      tg.run(*this);
+      return;
+    }
+    else if (recycle_into_east) {
+      j = j+1; //Non-static member variable cannot be modified in a const member function
+      tg.run(*this);
+      return;
+    }
+    else return;
+  }
+};
+*/
 
 int main (int argc, char **argv)
 {
   int n = 1000;
-  int nth= 4;
+  size_t nth= 4;
   int gs= 50;
 
   int size = n*n;
   std::vector<double> a_ser(size);
   std::vector<double> a_par(size);
-  std::vector<tbb::atomic<int>> counters(size);
+  //std::vector<std::atomic<int>> counters(size);
 
   //Initialize a_ser & a_par with dummy values
   for(int i=0; i<size; i++)
@@ -105,6 +143,7 @@ int main (int argc, char **argv)
   auto t_ser = (t1-t0).seconds()*1000;
 
   //Initialize matrix of counters
+  /*
   for(int i=0; i<n; i++)
     for (int j=0; j<n; j++)
       if (i == 1 || j==1) {
@@ -115,21 +154,24 @@ int main (int argc, char **argv)
       }
   counters[n+1] = 0;
 
-  tbb::task_scheduler_init init(nth);
+  tbb::global_control global_limit{tbb::global_control::max_allowed_parallelism, nth};
   common::warmupTBB(0.01, nth);
 
+  tbb::task_group tg;
   t0 = tbb::tick_count::now();
-  tbb::task::spawn_root_and_wait(*new(tbb::task::allocate_root())
-                                 Cell{1,1,n,gs,a_par,counters});
+  tg.run(Cell{1,1,n,gs,a_par,counters,tg});
+  tg.wait();
   t1 = tbb::tick_count::now();
   auto t_par = (t1-t0).seconds()*1000;
-
-  if (a_ser != a_par)
-      std::cerr << "Parallel computation failed!!" << std::endl;
+  */
 
   std::cout<<"Serial Time = " << t_ser <<" msec\n";
-  std::cout<<"Thrds = " << nth << "; Parallel Time = " << t_par << " msec\n";
-  std::cout<<"Speedup = " << t_ser/t_par << '\n';
+  // std::cout<<"Thrds = " << nth << "; Parallel Time = " << t_par << " msec\n";
+  // std::cout<<"Speedup = " << t_ser/t_par << '\n';
+  std::cout << "Parallel Time not computed. Task API removed.\n";
+  std::cout << "Task_group alternative can be used following a bypassing approach,\n";
+  std::cout << "but this example can not be implemented directly with bypassing.\n";
+  std::cout << "See: https://oneapi-src.github.io/oneTBB/main/tbb_userguide/Migration_Guide/Task_API.html\n";
 
   return 0;
 }

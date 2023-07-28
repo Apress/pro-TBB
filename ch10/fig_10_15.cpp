@@ -50,7 +50,7 @@ int main(int argc, char** argv)
   std::cout << "ParallelFib not computed. Task API removed.\n";
   std::cout << "Task_group alternative can be used following a recylcing approach,\n";
   std::cout << "but Fibonacci example can not be implemented directly with recycling.\n";
-  std::cout << "See: https://docs.oneapi.io/versions/latest/onetbb/tbb_userguide/Migration_Guide/Task_API.html\n";
+  std::cout << "See: https://oneapi-src.github.io/oneTBB/main/tbb_userguide/Migration_Guide/Task_API.html\n";
   return 0;
 }
 
