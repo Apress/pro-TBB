@@ -48,15 +48,14 @@ int main(int argc, char** argv) {
     tbb::parallel_for(0, n, [&](int i) {
       if (data[i]) data[i]=1/data[i];
       else{
-        tbb::movable_exception<div_ex> de{div_ex{i}};
-        throw de;
+        throw div_ex{i};
       }
     });
   }
-  catch(tbb::movable_exception<div_ex>& ex) {
-    std::cout << "Exception name: " << ex.data().name() << std::endl;
-    std::cout << "Exception: "      << ex.data().what();
-    std::cout << " at position: "   << ex.data().it << std::endl;
+  catch(div_ex& ex) {
+    std::cout << "Exception name: " << ex.name() << std::endl;
+    std::cout << "Exception: "      << ex.what();
+    std::cout << " at position: "   << ex.it << std::endl;
   }
   return 0;
 }
