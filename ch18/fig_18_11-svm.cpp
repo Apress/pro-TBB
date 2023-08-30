@@ -37,10 +37,8 @@ SPDX-License-Identifier: MIT
 #include <math.h>
 #include <tbb/flow_graph.h>
 #include <tbb/tick_count.h>
-#include <tbb/compat/thread>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
-#include <tbb/task_scheduler_init.h>
 #include <CL/cl2.hpp>
 
 int vsize;
@@ -202,16 +200,16 @@ int main(int argc, const char* argv[]) {
   float alpha = 0.5;
   opencl_initialize();
 
-  tbb::task_scheduler_init init{nth};
   tbb::flow::graph g;
 
-  bool n = false;
-  tbb::flow::source_node<float> in_node{g, [&](float& offload_ratio)->bool {
-    if(n) return false;
-    offload_ratio = ratio;
-    n = true;
-    return true;
-  },false};
+  tbb::flow::input_node<float> in_node{g,
+    [&](oneapi::tbb::flow_control &fc) -> float {
+      static bool already_done = false;
+      if (already_done) fc.stop();
+      already_done = true;
+      return ratio;
+    }
+  };
 
   tbb::flow::function_node<float, double> cpu_node{g,
     tbb::flow::unlimited,
