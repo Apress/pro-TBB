@@ -42,7 +42,7 @@ SPDX-License-Identifier: MIT
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
-#include <sycl/CL/cl.h>
+#include <CL/cl.h>
 #endif
 
 int vsize;

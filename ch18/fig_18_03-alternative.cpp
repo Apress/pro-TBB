@@ -23,8 +23,8 @@ SPDX-License-Identifier: MIT
 */
 
 #include <iostream>
-#include <oneapi/tbb/flow_graph.h>
-#include <oneapi/tbb/tick_count.h>
+#include <tbb/flow_graph.h>
+#include <tbb/tick_count.h>
 
 class AsyncActivity {
 public:

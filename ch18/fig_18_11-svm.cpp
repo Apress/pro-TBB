@@ -77,12 +77,12 @@ void opencl_initialize(){
     cl::Device device;
     bool found = false;
     for(auto& platform : platforms){
-      std::cout << "Platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
+      std::cout << "Finding in platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
       platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
       for (auto &d : devices){
          std::string name;
          d.getInfo(CL_DEVICE_NAME, &name);
-         std::cout << "Device Name: " << name << std::endl;
+         std::cout << "Found device Name: " << name << std::endl;
          if(name.find("Graphics")!=std::string::npos){
           found = true;
           device = d;
@@ -92,7 +92,7 @@ void opencl_initialize(){
     }
 
     // Choose first GPU device:
-    std::cout << "Device name: " << device.getInfo<CL_DEVICE_NAME>();
+    std::cout << "Finally using device name: " << device.getInfo<CL_DEVICE_NAME>();
     std::cout << " with " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << " compute units\n";
     std::cout << "OpenCL version: " << device.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << '\n';
     auto svmcapability = device.getInfo<CL_DEVICE_SVM_CAPABILITIES>();
