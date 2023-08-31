@@ -22,7 +22,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 SPDX-License-Identifier: MIT
 */
 
-#define TBB_PREVIEW_GLOBAL_CONTROL 1
+#define CL_TARGET_OPENCL_VERSION 200
 
 #include <cstdio>
 #include <iostream>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: MIT
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
-#include <CL/cl.h>
+#include <sycl/CL/cl.h>
 #endif
 
 int vsize;

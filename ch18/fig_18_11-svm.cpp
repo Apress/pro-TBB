@@ -39,7 +39,7 @@ SPDX-License-Identifier: MIT
 #include <tbb/tick_count.h>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
-#include <CL/cl2.hpp>
+#include <CL/opencl.hpp>
 
 int vsize;
 using svmalloc_t = cl::SVMAllocator<float, cl::SVMTraitFine<cl::SVMTraitReadWrite<>>>;
@@ -74,22 +74,24 @@ void opencl_initialize(){
     std::cout << "Number of platforms: " << platforms.size() << "\n";
     // Find first GPU device
     std::vector<cl::Device> devices;
+    cl::Device device;
     bool found = false;
-    for(auto& plat : platforms){
-      std::cout << "Platform name: " << plat.getInfo<CL_PLATFORM_NAME>() << '\n';
-      if(plat.getDevices(CL_DEVICE_TYPE_GPU, &devices)==CL_SUCCESS){
-        found = true;
-        break;
+    for(auto& platform : platforms){
+      std::cout << "Platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
+      platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+      for (auto &d : devices){
+         std::string name;
+         d.getInfo(CL_DEVICE_NAME, &name);
+         std::cout << "Device Name: " << name << std::endl;
+         if(name.find("Graphics")!=std::string::npos){
+          found = true;
+          device = d;
+          break;
+         }
       }
-      else std::cout << "No GPU found in this platform \n";
-    }
-    if(!found){
-      std::cout << "Oops, no GPU device found!\n";
-      exit(1);
     }
 
     // Choose first GPU device:
-    cl::Device device = devices[0];
     std::cout << "Device name: " << device.getInfo<CL_DEVICE_NAME>();
     std::cout << " with " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << " compute units\n";
     std::cout << "OpenCL version: " << device.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << '\n';

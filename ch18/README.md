@@ -18,11 +18,11 @@ OpenCL drivers should be installed depending on the platform at hand:
 - [Intel drivers for Linux and Windows](https://software.intel.com/en-us/articles/opencl-drivers)
 - [ARM drivers for Mali GPUs](https://developer.arm.com/tools-and-software/graphics-and-gaming/mali-drivers)
 - [AMD, NVIDIA and others](https://www.khronos.org/opencl/resources)
-- MacOS platforms (up to Mojave) come with OpenCL 1.2 preinstalled. OpenCL 2.0 is not available so `fig_18_11-svm.cpp` and `fig_18_11-svmCLheader.cpp` won't even compile.
+- MacOS platforms (up to Mojave) came with OpenCL 1.2 preinstalled. OpenCL 2.0 is not available so `fig_18_11-svm.cpp` and `fig_18_11-svmCLheader.cpp` won't even compile.
 
 The OpenCL SDK is already included in [Intel Studio 2019](https://software.intel.com/en-us/system-studio) (and you also get TBB, Intel compiler, VTune, etc. in the same package).
 
-The C++ OpenCL header, `cl2.hpp`, is already included within the Intel Studio 2019 OpenCL installation, but it can be downloaded also from the [OpenCL C++ Bindings page](https://github.khronos.org/OpenCL-CLHPP/index.html). If you prefer the original C-based `cl.h` header file, try `fig_18_11-CLheader.cpp` and `fig_18_11-svmCLheader.cpp`.
+The C++ OpenCL header, `opencl.hpp`, is already included within the oneAPI installation, but it can be downloaded also from the [OpenCL C++ Bindings page](https://github.com/KhronosGroup/OpenCL-CLHPP). If you prefer the original C-based `cl.h` header file, try `fig_18_11-CLheader.cpp` and `fig_18_11-svmCLheader.cpp`.
 
 Some systems provide different OpenCL platforms, and the GPU does not necessary lies on the first one. The four provided versions of `fig_18_11` example tackle this issue by traversing the different platforms and selecting the one with a GPU device.
 

@@ -25,7 +25,6 @@ SPDX-License-Identifier: MIT
 //#define CL_HPP_ENABLE_EXCEPTIONS
 #define CL_HPP_MINIMUM_OPENCL_VERSION 120
 #define CL_HPP_TARGET_OPENCL_VERSION 120
-#define TBB_PREVIEW_GLOBAL_CONTROL 1
 
 #include <cstdio>
 #include <iostream>
@@ -40,7 +39,7 @@ SPDX-License-Identifier: MIT
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 #include <tbb/global_control.h>
-#include "CL/cl2.hpp"
+#include "CL/opencl.hpp"
 
 int vsize;
 float* Ahost;                       // Host view of A, B and C arrays
@@ -75,21 +74,27 @@ void opencl_initialize(){
     std::cout << "Number of platforms: " << platforms.size() << "\n";
     // Find first GPU device
     std::vector<cl::Device> devices;
+    cl::Device device;
     bool found = false;
     for(auto& platform : platforms){
       std::cout << "Platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
-      if(platform.getDevices(CL_DEVICE_TYPE_GPU, &devices)==CL_SUCCESS){
-        found = true;
-        break;
+      platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+      for (auto &d : devices){
+         std::string name;
+         d.getInfo(CL_DEVICE_NAME, &name);
+         std::cout << "Device Name: " << name << std::endl;
+         if(name.find("Graphics")!=std::string::npos){
+          found = true;
+          device=d;
+          break;
+         }
       }
-      else std::cout << "No GPU found in this platform \n";
     }
     if(!found){
       std::cout << "Oops, no GPU device found!\n";
       exit(1);
     }
-    // Choose first GPU device:
-    cl::Device device=devices[0];
+    // Choose first integrate GPU device:
     std::cout << "Device name: "<< device.getInfo<CL_DEVICE_NAME>();
     std::cout << " with " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << " compute units" << '\n';
 

@@ -22,6 +22,8 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 SPDX-License-Identifier: MIT
 */
 
+#define CL_TARGET_OPENCL_VERSION 200
+
 #include <cstdio>
 #include <vector>
 #include <iostream>
@@ -117,9 +119,13 @@ void OpenCL_Initialize(){
     fprintf(stderr, "SVM capabilities not available");
     exit(1);
   }
-
+    
   if (device_svm & CL_DEVICE_SVM_FINE_GRAIN_BUFFER)
     fprintf(stderr, "SVM FINE GRAIN BUFFER supported!\n");
+  else{
+    fprintf(stderr, "SVM FINE GRAIN BUFFER not supported! Exit!\n");
+    exit(1);
+  }
 
   if (device_svm & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER)
     fprintf(stderr, "SVM COARSE GRAIN BUFFER supported!\n");

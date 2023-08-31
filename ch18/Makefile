@@ -33,7 +33,7 @@ UNAME := $(shell uname)
 
 ifeq ($(UNAME),Linux)
 #Compile OpenCL on Linux
-  CLFRAMEWORK = -I /opt/intel/oneapi/compiler/2023.2.1/linux/include/sycl/ -lOpenCL
+  CLFRAMEWORK = -I ~/OpenCL-CLHPP-main/include -I /opt/intel/oneapi/compiler/2023.1.0/linux/include/sycl/  -lOpenCL
 endif
 
 ifeq ($(UNAME),Darwin)
@@ -42,7 +42,7 @@ ifeq ($(UNAME),Darwin)
 endif
 
 CXX = icpx
-CXXFLAGS = $(EXTRA_CXXFLAGS) -std=c++11 -O2
+CXXFLAGS = $(EXTRA_CXXFLAGS) -std=c++17 -O2
 LIBS = -ltbb -lpthread
 
 .PHONY : all clean fig_18_03-alternative fig_18_03 fig_18_04 fig_18_11 fig_18_11-svm fig_18_11-CLheader fig_18_11-svmCLheader
