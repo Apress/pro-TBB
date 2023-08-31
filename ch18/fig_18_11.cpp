@@ -25,7 +25,6 @@ SPDX-License-Identifier: MIT
 //#define CL_HPP_ENABLE_EXCEPTIONS
 #define CL_HPP_MINIMUM_OPENCL_VERSION 120
 #define CL_HPP_TARGET_OPENCL_VERSION 120
-#define TBB_PREVIEW_GLOBAL_CONTROL 1
 
 #include <cstdio>
 #include <iostream>
@@ -37,12 +36,10 @@ SPDX-License-Identifier: MIT
 #include <math.h>
 #include <tbb/flow_graph.h>
 #include <tbb/tick_count.h>
-#include <tbb/compat/thread>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
-#include <tbb/task_scheduler_init.h>
 #include <tbb/global_control.h>
-#include "CL/cl2.hpp"
+#include "CL/opencl.hpp"
 
 int vsize;
 float* Ahost;                       // Host view of A, B and C arrays
@@ -77,22 +74,28 @@ void opencl_initialize(){
     std::cout << "Number of platforms: " << platforms.size() << "\n";
     // Find first GPU device
     std::vector<cl::Device> devices;
+    cl::Device device;
     bool found = false;
     for(auto& platform : platforms){
-      std::cout << "Platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
-      if(platform.getDevices(CL_DEVICE_TYPE_GPU, &devices)==CL_SUCCESS){
-        found = true;
-        break;
+      std::cout << "Finding in platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
+      platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+      for (auto &d : devices){
+         std::string name;
+         d.getInfo(CL_DEVICE_NAME, &name);
+         std::cout << "Found Device Name: " << name << std::endl;
+         if(name.find("Graphics")!=std::string::npos){
+          found = true;
+          device=d;
+          break;
+         }
       }
-      else std::cout << "No GPU found in this platform \n";
     }
     if(!found){
       std::cout << "Oops, no GPU device found!\n";
       exit(1);
     }
-    // Choose first GPU device:
-    cl::Device device=devices[0];
-    std::cout << "Device name: "<< device.getInfo<CL_DEVICE_NAME>();
+    // Choose first integrate GPU device:
+    std::cout << "Finally using device name: "<< device.getInfo<CL_DEVICE_NAME>();
     std::cout << " with " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << " compute units" << '\n';
 
     // Create the context
@@ -144,7 +147,7 @@ class AsyncActivity {
   tbb::task_arena a;
 public:
   AsyncActivity() {
-    a = tbb::task_arena{1,0};
+    a.initialize(1,0);
   }
   using async_node_t = tbb::flow::async_node<float, double>;
   using gateway_t = async_node_t::gateway_type;
@@ -179,18 +182,18 @@ int main(int argc, const char* argv[]) {
   float alpha = 0.5;
   opencl_initialize(); // OpenCL boilerplate
 
-  tbb::task_scheduler_init init{nth};
   auto mp=tbb::global_control::max_allowed_parallelism;
   tbb::global_control gc(mp, nth+1); //One more thread, but sleeping
   tbb::flow::graph g;
 
-  bool n = false;
-  tbb::flow::source_node<float> in_node{g, [&](float& offload_ratio) {
-    if(n) return false;
-    offload_ratio = ratio;
-    n = true;
-    return true;
-  },false};
+  tbb::flow::input_node<float> in_node{g,
+    [&](oneapi::tbb::flow_control &fc) -> float {
+      static bool already_done = false;
+      if (already_done) fc.stop();
+      already_done = true;
+      return ratio;
+    }
+  };
 
   tbb::flow::function_node<float, double> cpu_node{g,
     tbb::flow::unlimited,

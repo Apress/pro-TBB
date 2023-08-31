@@ -12,7 +12,7 @@
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.ï¿½ IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 # OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
@@ -33,7 +33,7 @@ UNAME := $(shell uname)
 
 ifeq ($(UNAME),Linux)
 #Compile OpenCL on Linux
-  CLFRAMEWORK = -lOpenCL
+  CLFRAMEWORK = -I ~/OpenCL-CLHPP/include/ -I /opt/intel/oneapi/compiler/latest/linux/include/sycl/  -lOpenCL
 endif
 
 ifeq ($(UNAME),Darwin)
@@ -41,9 +41,9 @@ ifeq ($(UNAME),Darwin)
   CLFRAMEWORK = -framework OpenCL -Wno-deprecated-declarations
 endif
 
-CXX = icc
-CXXFLAGS = $(EXTRA_CXXFLAGS) -std=c++11 -O2
-LIBS = -ltbb -lpthread
+CXX = icpx
+CXXFLAGS = $(EXTRA_CXXFLAGS) -std=c++17 -O2
+LIBS = -tbb -lpthread
 
 .PHONY : all clean fig_18_03-alternative fig_18_03 fig_18_04 fig_18_11 fig_18_11-svm fig_18_11-CLheader fig_18_11-svmCLheader
 

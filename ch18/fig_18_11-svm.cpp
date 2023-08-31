@@ -37,11 +37,9 @@ SPDX-License-Identifier: MIT
 #include <math.h>
 #include <tbb/flow_graph.h>
 #include <tbb/tick_count.h>
-#include <tbb/compat/thread>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
-#include <tbb/task_scheduler_init.h>
-#include <CL/cl2.hpp>
+#include <CL/opencl.hpp>
 
 int vsize;
 using svmalloc_t = cl::SVMAllocator<float, cl::SVMTraitFine<cl::SVMTraitReadWrite<>>>;
@@ -76,23 +74,25 @@ void opencl_initialize(){
     std::cout << "Number of platforms: " << platforms.size() << "\n";
     // Find first GPU device
     std::vector<cl::Device> devices;
+    cl::Device device;
     bool found = false;
-    for(auto& plat : platforms){
-      std::cout << "Platform name: " << plat.getInfo<CL_PLATFORM_NAME>() << '\n';
-      if(plat.getDevices(CL_DEVICE_TYPE_GPU, &devices)==CL_SUCCESS){
-        found = true;
-        break;
+    for(auto& platform : platforms){
+      std::cout << "Finding in platform name: " << platform.getInfo<CL_PLATFORM_NAME>() << '\n';
+      platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+      for (auto &d : devices){
+         std::string name;
+         d.getInfo(CL_DEVICE_NAME, &name);
+         std::cout << "Found device Name: " << name << std::endl;
+         if(name.find("Graphics")!=std::string::npos){
+          found = true;
+          device = d;
+          break;
+         }
       }
-      else std::cout << "No GPU found in this platform \n";
-    }
-    if(!found){
-      std::cout << "Oops, no GPU device found!\n";
-      exit(1);
     }
 
     // Choose first GPU device:
-    cl::Device device = devices[0];
-    std::cout << "Device name: " << device.getInfo<CL_DEVICE_NAME>();
+    std::cout << "Finally using device name: " << device.getInfo<CL_DEVICE_NAME>();
     std::cout << " with " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << " compute units\n";
     std::cout << "OpenCL version: " << device.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << '\n';
     auto svmcapability = device.getInfo<CL_DEVICE_SVM_CAPABILITIES>();
@@ -202,16 +202,16 @@ int main(int argc, const char* argv[]) {
   float alpha = 0.5;
   opencl_initialize();
 
-  tbb::task_scheduler_init init{nth};
   tbb::flow::graph g;
 
-  bool n = false;
-  tbb::flow::source_node<float> in_node{g, [&](float& offload_ratio)->bool {
-    if(n) return false;
-    offload_ratio = ratio;
-    n = true;
-    return true;
-  },false};
+  tbb::flow::input_node<float> in_node{g,
+    [&](oneapi::tbb::flow_control &fc) -> float {
+      static bool already_done = false;
+      if (already_done) fc.stop();
+      already_done = true;
+      return ratio;
+    }
+  };
 
   tbb::flow::function_node<float, double> cpu_node{g,
     tbb::flow::unlimited,
