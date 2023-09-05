@@ -30,6 +30,7 @@ SPDX-License-Identifier: MIT
 #include <vector>
 #include <thread>
 #include <assert.h>
+#include <atomic>
 #include <tbb/tbb.h>
 
 std::vector<double> times;
@@ -39,10 +40,10 @@ class PinningObserver : public tbb::task_scheduler_observer {
   hwloc_obj_t numa_node;
   int numa_id;
   int num_nodes;
-  tbb::atomic<int> thds_per_node;
-  tbb::atomic<int> masters_that_entered;
-  tbb::atomic<int> workers_that_entered;
-  tbb::atomic<int> threads_pinned;
+  std::atomic<int> thds_per_node;
+  std::atomic<int> masters_that_entered;
+  std::atomic<int> workers_that_entered;
+  std::atomic<int> threads_pinned;
 public:
   PinningObserver(tbb::task_arena& arena, hwloc_topology_t& _topo,
                   int _numa_id, int _thds_per_node)
@@ -71,7 +72,7 @@ public:
     if(--thds_per_node > 0){
       int err=hwloc_set_cpubind(topo, numa_node->cpuset,
             HWLOC_CPUBIND_THREAD);
-      std::cout << "Error setting CPU bind on this platform\n";
+      if (err) std::cout << "Error setting CPU bind on this platform\n";
       //std::printf("Pinned thread %d to NUMA node %d\n", std::this_thread::get_id(), numa_id);
       threads_pinned++;
     }
@@ -107,7 +108,7 @@ void alloc_thr_per_node(hwloc_topology_t topo, double** data,
                                             HWLOC_OBJ_NUMANODE,i);
         int err = hwloc_set_cpubind(topo, numa_node->cpuset,
                                     HWLOC_CPUBIND_THREAD);
-        std::cout << "Error setting CPU bind on this platform\n";
+        if (err) std::cout << "Error setting CPU bind on this platform\n";
         double *A = data[i];
         double *B = data[i] + lsize;
         double *C = data[i] + 2*lsize;
@@ -154,7 +155,8 @@ int main(int argc, char** argv)
   alloc_mem_per_node(topo, data, doubles_per_node);
 
   //* One master thread per NUMA node
-  tbb::task_scheduler_init init{(thds_per_node-1)*num_nodes};
+  auto mp=tbb::global_control::max_allowed_parallelism;
+  tbb::global_control gc(mp, (thds_per_node-1)*num_nodes);
   auto t = tbb::tick_count::now();
   alloc_thr_per_node(topo, data, vsize/num_nodes, thds_per_node);
   double ts = (tbb::tick_count::now() - t).seconds();
