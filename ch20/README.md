@@ -4,8 +4,8 @@ In addition to the TBB library, this chapter also requires the [hwloc](https://w
 
 Follow these steps to install and use hwloc:
 
-1. Download the library from the [download page](https://www.open-mpi.org/software/hwloc/v2.0/).
-2. Install the library following the usual GNU-based procedure (more details [here](https://www.open-mpi.org/projects/hwloc/doc/v2.0.3/)):
+1. Download the library from the [download page](https://www.open-mpi.org/software/hwloc/v2.9/).
+2. Install the library following the usual GNU-based procedure (more details [here](https://www.open-mpi.org/projects/hwloc/doc/)):
 
     ```
     shell$ ./configure --prefix=<install_dir> && make && make install
