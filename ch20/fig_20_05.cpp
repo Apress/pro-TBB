@@ -32,7 +32,8 @@ int main(int argc, const char* argv[]) {
   int nth = 4;
   size_t vsize = 100000000;
   float alpha = 0.5;
-  tbb::task_scheduler_init init{nth};
+  auto mp=tbb::global_control::max_allowed_parallelism;
+  tbb::global_control gc(mp, nth);
 
   std::unique_ptr<double[]> A{new double[vsize]};
   std::unique_ptr<double[]> B{new double[vsize]};
