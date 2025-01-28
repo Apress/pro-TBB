@@ -20,7 +20,7 @@ else()
   set(_cxx_compiler_supports_sycl FALSE)
 endif()
 
-CHECK_INCLUDE_FILE_CXX("<execution>" _cxx_compiler_has_execution_header)
+CHECK_INCLUDE_FILE_CXX("execution" _cxx_compiler_has_execution_header)
 
 set(_regexp_exclude_current_binary_dir "(${CMAKE_CURRENT_BINARY_DIR})")
 set(_regexp_cxx17_required "(parallel_for_each_fwd_substitution.cpp|graph_limiting_messages.cpp|graph_loops.cpp|graph_node_priorities.cpp|graph_reestablish_order.cpp|graph_small_nodes.cpp|graph_two_nodes_deduced.cpp|graph_with_join.cpp|migrate_parallel_do.cpp|migrate_recycling.cpp)")
