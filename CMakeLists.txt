@@ -20,9 +20,12 @@ else()
   set(_cxx_compiler_supports_sycl FALSE)
 endif()
 
+CHECK_INCLUDE_FILE_CXX("execution" _cxx_compiler_has_execution_header)
+
 set(_regexp_exclude_current_binary_dir "(${CMAKE_CURRENT_BINARY_DIR})")
 set(_regexp_cxx17_required "(parallel_for_each_fwd_substitution.cpp|graph_limiting_messages.cpp|graph_loops.cpp|graph_node_priorities.cpp|graph_reestablish_order.cpp|graph_small_nodes.cpp|graph_two_nodes_deduced.cpp|graph_with_join.cpp|migrate_parallel_do.cpp|migrate_recycling.cpp)")
 set(_regexp_cxx20_required "(task_group_with_dependencies.cpp|migrate_bypass_tasks.cpp|intro_parallel_for_transform.cpp|migrate_tasks_adding_work.cpp)")
+set(_regexp_execution_required "(intro_parallel_for_transform.cpp)")
 set(_regexp_sycl_required "(graph_async_sycl.cpp|resumable_tasks.cpp)")
 set(_regexp_tbbmalloc_required "(memalloc)")
 set(_regexp_tbbmalloc_windows_only "(memalloc/windows_proxy.cpp)")
@@ -50,6 +53,12 @@ macro(tbb_tutorials_add_example _example_source_file)
       if (NOT CMAKE_HOST_WIN32 AND
           _example_source_file MATCHES "${_regexp_tbbmalloc_windows_only}")
         message(STATUS "Skip ${_example_source_file} since the OS is not supported by this example")
+        continue()
+      endif()
+
+      if (_example_source_file MATCHES "${_regexp_execution_required}" AND
+          NOT _cxx_compiler_has_execution_header)
+        message(STATUS "Skip ${_example_source_file} since <execution> header is not available")
         continue()
       endif()
 
