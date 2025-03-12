@@ -40,7 +40,7 @@ double parallelPI(int num_intervals) {
   double dx = 1.0 / num_intervals;
   double sum = tbb::parallel_reduce(
     /* range = */ tbb::blocked_range<int>(0, num_intervals), 
-    /* idenity = */ 0.0,
+    /* identity = */ 0.0,
     /* func */ 
     [=](const tbb::blocked_range<int>& r, double init) -> double {
       for (int i = r.begin(); i != r.end(); ++i) {
