@@ -190,9 +190,9 @@ int main(int argc, char **argv)
 
     tbb::parallel_for(tbb::blocked_range<int>(0,values.size()),
 		      [&](tbb::blocked_range<int> r) {
-			for (int i=r.begin(); i<r.end(); ++i) {
-			  values[i] = bbp.EightHexPiDigits(i*8);
-			}
+            for (int i=r.begin(); i<r.end(); ++i) {
+              values[i] = bbp.EightHexPiDigits(i*8);
+            }
 		      });
 
     for (unsigned eightdigits : values)

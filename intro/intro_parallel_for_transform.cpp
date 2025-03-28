@@ -152,4 +152,3 @@ int main(int argc, char* argv[]) {
             << " seconds" << std::endl;
   return 0;
 }
-
