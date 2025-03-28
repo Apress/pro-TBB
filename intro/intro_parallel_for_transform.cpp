@@ -19,10 +19,17 @@
 #include <iostream>
 #include <vector>
 #include <tbb/tbb.h>
+#include<version>
 #include "intro_examples.h"
 
 using ImagePtr = std::shared_ptr<ch01::Image>;
 void writeImage(ImagePtr image_ptr);
+
+#if __cpp_lib_execution < 201902L
+auto policy = std::execution::seq;
+#else
+auto policy = std::execution::unseq;
+#endif
 
 ImagePtr applyGamma(ImagePtr image_ptr, double gamma) {
   auto output_image_ptr = 
@@ -37,7 +44,7 @@ ImagePtr applyGamma(ImagePtr image_ptr, double gamma) {
     [&in_rows, &out_rows, width, gamma](int i) {
       auto in_row = in_rows[i];
       auto out_row = out_rows[i];
-      std::transform(std::execution::unseq, in_row, in_row+width, 
+      std::transform(policy, in_row, in_row+width, 
         out_row, [gamma](const ch01::Image::Pixel& p) {
           double v = 0.3*p.bgra[2] + 0.59*p.bgra[1] + 0.11*p.bgra[0];
           double res = pow(v, gamma);
@@ -62,7 +69,7 @@ ImagePtr applyTint(ImagePtr image_ptr, const double *tints) {
     [&in_rows, &out_rows, width, tints](int i) {
       auto in_row = in_rows[i];
       auto out_row = out_rows[i];
-      std::transform(std::execution::unseq, in_row, in_row+width, 
+      std::transform(policy, in_row, in_row+width,
         out_row, [tints](const ch01::Image::Pixel& p) {
           std::uint8_t b = (double)p.bgra[0] + 
                            (ch01::MAX_BGR_VALUE-p.bgra[0])*tints[0];
