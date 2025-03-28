@@ -13,7 +13,7 @@ Source code of the examples provided in each chapter of the new TBB book. Coming
 To configure, at the command prompt, type
 
 ```cpp
-cmake <options> <repo_root
+cmake <options> <repo_root>
 ```
 
 To build the examples, run
