@@ -166,5 +166,5 @@ example source file. The table below can be used to map book figure numbers to t
 
 Feel free to leave comments/suggestions/feedback.
 
-Mike and Jame
+Mike and James
 
