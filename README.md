@@ -8,7 +8,7 @@ Source code of the examples provided in each chapter of the new TBB book. Coming
    - Make sure you have installed CMake version 3.4 (or newer) on your system. These examples use CMake build configuration
    - TBB, which is needed of course, can be installed [from source](https://github.com/uxlfoundation/oneTBB) or as part of a [oneAPI tookit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/overview.html)
 
-## Buildin
+## Building
 
 To configure, at the command prompt, type
 
